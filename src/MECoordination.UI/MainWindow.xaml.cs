@@ -11,10 +11,19 @@ namespace ElectricalToolSuite.MECoordination.UI
         public Window1()
         {
             InitializeComponent();
+            tree.Focus();
+        }
 
-            SelectableTreeViewModel root = this.tree.Items[0] as SelectableTreeViewModel;
+        public IEnumerable<ElementTreeViewModel> Roots
+        {
+            get { return tree.Items.Cast<ElementTreeViewModel>(); }
+        }
 
-            base.CommandBindings.Add(
+        public void AddRoot(ElementTreeViewModel root)
+        {
+            tree.Items.Add(root);
+
+            CommandBindings.Add(
                 new CommandBinding(
                     ApplicationCommands.Undo,
                     (sender, e) => // Execute
@@ -28,34 +37,6 @@ namespace ElectricalToolSuite.MECoordination.UI
                         e.Handled = true;
                         e.CanExecute = (root.IsChecked != false);
                     }));
-
-            this.tree.Focus();
-        }
-
-        public IEnumerable<string> SelectedItems
-        {
-            get
-            {
-                var s = new Stack<SelectableTreeViewModel>();
-
-                foreach (var item in tree.Items)
-                    s.Push((SelectableTreeViewModel) item);
-
-                while (s.Any())
-                {
-                    var vm = s.Pop();
-
-                    if (vm.Children.Any())
-                    {
-                        foreach (var c in vm.Children)
-                            s.Push(c);
-                        continue;
-                    }
-
-                    if ((vm.IsChecked.HasValue && vm.IsChecked.Value) || (!vm.IsChecked.HasValue && vm.IsInitiallySelected))
-                        yield return vm.Name;
-                }
-            }
         }
     }
 }
