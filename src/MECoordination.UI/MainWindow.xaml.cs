@@ -1,42 +1,32 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Input;
-using MECoordination.UI;
+using System.Windows.Controls;
 
 namespace ElectricalToolSuite.MECoordination.UI
 {
-    public partial class Window1 : Window
+    public partial class TreeViewMultipleTemplatesSample : Window
     {
-        public Window1()
+        public TreeViewMultipleTemplatesSample()
         {
             InitializeComponent();
-            tree.Focus();
+
+//            List<CategoryItem> categories = new List<CategoryItem>();
+
+//            CategoryItem category1 = new CategoryItem() { Name = "The Doe's" };
+//            family1.Symbols.Add(new FamilySymbol() { Name = "John Doe", Age = 42 });
+//            family1.Symbols.Add(new FamilySymbol() { Name = "Jane Doe", Age = 39 });
+//            family1.Symbols.Add(new FamilySymbol() { Name = "Sammy Doe", Age = 13 });
+//            families.Add(family1);
+
+//            FamilyItem family2 = new FamilyItem() { Name = "The Moe's" };
+//            family2.Symbols.Add(new FamilySymbol() { Name = "Mark Moe", Age = 31 });
+//            family2.Symbols.Add(new FamilySymbol() { Name = "Norma Moe", Age = 28 });
+//            families.Add(family2);
+
+//            trvFamilies.ItemsSource = families;
         }
 
-        public IEnumerable<ElementTreeViewModel> Roots
-        {
-            get { return tree.Items.Cast<ElementTreeViewModel>(); }
-        }
-
-        public void AddRoot(ElementTreeViewModel root)
-        {
-            tree.Items.Add(root);
-
-            CommandBindings.Add(
-                new CommandBinding(
-                    ApplicationCommands.Undo,
-                    (sender, e) => // Execute
-                    {
-                        e.Handled = true;
-                        root.IsChecked = false;
-                        this.tree.Focus();
-                    },
-                    (sender, e) => // CanExecute
-                    {
-                        e.Handled = true;
-                        e.CanExecute = (root.IsChecked != false);
-                    }));
-        }
+        public TreeView Categories { get { return trvFamilies; } }
     }
 }
