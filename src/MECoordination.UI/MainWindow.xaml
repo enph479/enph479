@@ -6,38 +6,35 @@
     <Grid Margin="10">
         <TreeView Name="trvFamilies">
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type self:CategoryItem}" ItemsSource="{Binding Families}">
+                <HierarchicalDataTemplate DataType="{x:Type self:TreeViewItemWithCheckbox}" ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <CheckBox IsChecked="{Binding Checked}"/>
                         <TextBlock Text="{Binding Name}" />
                         <TextBlock Text=" [" Foreground="Blue" />
-                        <TextBlock Text="{Binding Families.Count}" Foreground="Blue" />
+                        <TextBlock Text="{Binding Children.Count}" Foreground="Blue" />
                         <TextBlock Text="]" Foreground="Blue" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type self:FamilyItem}" ItemsSource="{Binding Symbols}">
+<!--                <HierarchicalDataTemplate DataType="{x:Type self:FamilyItem}" ItemsSource="{Binding Symbols}">-->
+<!--                    <StackPanel Orientation="Horizontal">-->
+<!--                        <CheckBox IsChecked="{Binding Checked}"/>-->
+<!--                        <TextBlock Text="{Binding Name}" />-->
+<!--                        <TextBlock Text=" [" Foreground="Blue" />-->
+<!--                        <TextBlock Text="{Binding Symbols.Count}" Foreground="Blue" />-->
+<!--                        <TextBlock Text="]" Foreground="Blue" />-->
+<!--                    </StackPanel>-->
+<!--                </HierarchicalDataTemplate>-->
+                <DataTemplate DataType="{x:Type self:FamilySymbolItem}">
                     <StackPanel Orientation="Horizontal">
                         <CheckBox IsChecked="{Binding Checked}"/>
-                        <TextBlock Text="{Binding Name}" />
-                        <TextBlock Text=" [" Foreground="Blue" />
-                        <TextBlock Text="{Binding Symbols.Count}" Foreground="Blue" />
-                        <TextBlock Text="]" Foreground="Blue" />
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type self:FamilySymbolItem}" ItemsSource="{Binding Instances}">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Checked}"/>
-                        <TextBlock Text="{Binding Name}" />
-                        <TextBlock Text=" [" Foreground="Blue" />
-                        <TextBlock Text="{Binding Instances.Count}" Foreground="Blue" />
-                        <TextBlock Text="]" Foreground="Blue" />
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type self:FamilyInstanceItem}">
-                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Name}" />
                     </StackPanel>
                 </DataTemplate>
+<!--                <DataTemplate DataType="{x:Type self:FamilyInstanceItem}">-->
+<!--                    <StackPanel Orientation="Horizontal">-->
+<!--                        <TextBlock Text="{Binding Name}" />-->
+<!--                    </StackPanel>-->
+<!--                </DataTemplate>-->
             </TreeView.Resources>
         </TreeView>
     </Grid>

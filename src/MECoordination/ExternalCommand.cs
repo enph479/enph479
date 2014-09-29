@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -17,35 +14,29 @@ namespace ElectricalToolSuite.MECoordination
         {
             var doc = commandData.Application.ActiveUIDocument.Document;
 
-            var collector = new FilteredElementCollector(doc);
-
-            var familySymbols = collector.OfClass(typeof(FamilySymbol))
-                                         .Cast<FamilySymbol>()
-                                         .Where(fs => fs.Category != null);
-
-            var families = familySymbols.GroupBy(fs => fs.Family.Id);
-            var categories = families.GroupBy(g => doc.GetElement(g.First().Id).Category.Name).OrderBy(g => g.Key);
-
-            var categoryItems = new List<CategoryItem>();
+            var familySymbols = new FilteredElementCollector(doc).OfClass(typeof (FamilySymbol)).Cast<FamilySymbol>();
+//            var families = new FilteredElementCollector(doc).OfClass(typeof (Family)).Cast<Family>();
+            var categories = new ElementCategorizer().GroupByFamilyAndCategoryNames(familySymbols);
+            var categoryTreeViewItems = new List<TreeViewItemWithCheckbox>();
 
             foreach (var categoryGroup in categories)
             {
-                var categoryItem = new CategoryItem(categoryGroup.Key);
+                var categoryItem = new TreeViewItemWithCheckbox(categoryGroup.Key);
                 foreach (var familyGroup in categoryGroup)
                 {
-                    var familyItem = new FamilyItem { Family = doc.GetElement(familyGroup.Key) as Family };
+                    var familyItem = new TreeViewItemWithCheckbox(familyGroup.Key);
                     foreach (var familySymbol in familyGroup)
                     {
-                        var familySymbolItem = new FamilySymbolItem { FamilySymbol = familySymbol };
-                        familyItem.Symbols.Add(familySymbolItem);
+                        var familySymbolItem = new FamilySymbolItem(familySymbol.Name, familySymbol);
+                        familyItem.AddChild(familySymbolItem);
                     }
-                    categoryItem.Families.Add(familyItem);
+                    categoryItem.AddChild(familyItem);
                 }
-                categoryItems.Add(categoryItem);
+                categoryTreeViewItems.Add(categoryItem);
             }
 
             var wnd = new TreeViewMultipleTemplatesSample();
-            wnd.Categories.ItemsSource = categoryItems;
+            wnd.Categories.ItemsSource = categoryTreeViewItems;
 
             wnd.ShowDialog();
 
