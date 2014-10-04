@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MECoordination", "MECoordination\MECoordination.csproj", "{B705134D-378F-4F39-AEFA-C59A6752AD6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MECoordination.UI", "MECoordination.UI\MECoordination.UI.csproj", "{FE70BDE5-A3EC-49DA-9CA0-09E9530ABDFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionWrapper", "ExtensionWrapper\ExtensionWrapper.csproj", "{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,9 @@ Global
 		{B705134D-378F-4F39-AEFA-C59A6752AD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B705134D-378F-4F39-AEFA-C59A6752AD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B705134D-378F-4F39-AEFA-C59A6752AD6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE70BDE5-A3EC-49DA-9CA0-09E9530ABDFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE70BDE5-A3EC-49DA-9CA0-09E9530ABDFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE70BDE5-A3EC-49DA-9CA0-09E9530ABDFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE70BDE5-A3EC-49DA-9CA0-09E9530ABDFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

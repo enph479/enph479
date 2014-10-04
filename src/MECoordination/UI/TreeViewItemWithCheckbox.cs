@@ -21,8 +21,8 @@ namespace ElectricalToolSuite.MECoordination.UI
             get { return _checked; }
             set { SetIsChecked(value, true, true); }
         }
-        
-        void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
+
+        private void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
         {
             if (value == _checked)
                 return;
@@ -43,7 +43,7 @@ namespace ElectricalToolSuite.MECoordination.UI
             OnPropertyChanged("Checked");
         }
 
-        void VerifyCheckState()
+        private void VerifyCheckState()
         {
             bool? state = null;
             for (int i = 0; i < Children.Count; ++i)
@@ -69,7 +69,7 @@ namespace ElectricalToolSuite.MECoordination.UI
         }
 
         public string Name { get; set; }
-        
+
         public ObservableCollection<TreeViewItemWithCheckbox> Children { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 

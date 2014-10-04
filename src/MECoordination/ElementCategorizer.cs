@@ -6,7 +6,8 @@ namespace ElectricalToolSuite.MECoordination
 {
     public class ElementCategorizer
     {
-        public IEnumerable<IGrouping<Category, IGrouping<Family, FamilySymbol>>> GroupByFamilyAndCategory(IEnumerable<FamilySymbol> familySymbols)
+        public IEnumerable<IGrouping<Category, IGrouping<Family, FamilySymbol>>> GroupByFamilyAndCategory(
+            IEnumerable<FamilySymbol> familySymbols)
         {
             familySymbols = familySymbols.Where(fs => fs.Category != null)
                 .OrderBy(fs => fs.Name);
@@ -18,7 +19,8 @@ namespace ElectricalToolSuite.MECoordination
                 .OrderBy(g => g.Key.Name);
         }
 
-        public IEnumerable<IGrouping<string, IGrouping<string, FamilySymbol>>> GroupByFamilyAndCategoryNames(IEnumerable<FamilySymbol> familySymbols)
+        public IEnumerable<IGrouping<string, IGrouping<string, FamilySymbol>>> GroupByFamilyAndCategoryNames(
+            IEnumerable<FamilySymbol> familySymbols)
         {
             familySymbols = familySymbols.Where(fs => fs.Category != null)
                 .OrderBy(fs => fs.Name);

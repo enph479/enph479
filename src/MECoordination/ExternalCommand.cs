@@ -15,8 +15,20 @@ namespace ElectricalToolSuite.MECoordination
             var doc = commandData.Application.ActiveUIDocument.Document;
 
             var familySymbols = new FilteredElementCollector(doc).OfClass(typeof (FamilySymbol)).Cast<FamilySymbol>();
-//            var families = new FilteredElementCollector(doc).OfClass(typeof (Family)).Cast<Family>();
             var categories = new ElementCategorizer().GroupByFamilyAndCategoryNames(familySymbols);
+
+            var wnd = new MainWindow();
+            wnd.MechanicalTree.ItemsSource = GenerateTreeViewData(categories);
+            wnd.ElectricalTree.ItemsSource = GenerateTreeViewData(categories);
+
+            wnd.ShowDialog();
+
+            return Result.Succeeded;
+        }
+
+        private static List<TreeViewItemWithCheckbox> GenerateTreeViewData(
+            IEnumerable<IGrouping<string, IGrouping<string, FamilySymbol>>> categories)
+        {
             var categoryTreeViewItems = new List<TreeViewItemWithCheckbox>();
 
             foreach (var categoryGroup in categories)
@@ -34,13 +46,7 @@ namespace ElectricalToolSuite.MECoordination
                 }
                 categoryTreeViewItems.Add(categoryItem);
             }
-
-            var wnd = new TreeViewMultipleTemplatesSample();
-            wnd.Categories.ItemsSource = categoryTreeViewItems;
-
-            wnd.ShowDialog();
-
-            return Result.Succeeded;
+            return categoryTreeViewItems;
         }
     }
 }

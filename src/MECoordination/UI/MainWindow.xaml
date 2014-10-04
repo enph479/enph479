@@ -1,0 +1,55 @@
+﻿<Window x:Class="ElectricalToolSuite.MECoordination.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:ElectricalToolSuite.MECoordination.UI"
+        Title="Mechanical and Electrical Equipment Coordinator" Height="482" Width="779">
+    <Grid Margin="10">
+        <TreeView x:Name="MechanicalTree" Margin="20,26,386,36">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type ui:TreeViewItemWithCheckbox}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Checked}" />
+                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text=" [" Foreground="Blue" />
+                        <TextBlock Text="{Binding Children.Count}" Foreground="Blue" />
+                        <TextBlock Text="]" Foreground="Blue" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type ui:FamilySymbolItem}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Checked}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <TreeView x:Name="ElectricalTree" Margin="386,26,21,36">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type ui:TreeViewItemWithCheckbox}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Checked}" />
+                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text=" [" Foreground="Blue" />
+                        <TextBlock Text="{Binding Children.Count}" Foreground="Blue" />
+                        <TextBlock Text="]" Foreground="Blue" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type ui:FamilySymbolItem}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Checked}" />
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <Label Content="Mechanical families to find:" HorizontalAlignment="Left" VerticalAlignment="Top"
+               Margin="20,0,0,0" />
+        <Label Content="Electrical families to insert:" HorizontalAlignment="Left" Margin="386,0,0,0"
+               VerticalAlignment="Top" />
+        <Button Content="Cancel" HorizontalAlignment="Left" Margin="655,411,0,0" VerticalAlignment="Top" Width="75"
+                IsCancel="True" />
+        <Button Content="OK" HorizontalAlignment="Left" Margin="565,411,0,0" VerticalAlignment="Top" Width="75" />
+    </Grid>
+</Window>
