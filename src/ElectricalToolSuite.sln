@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MECoordination", "MECoordination\MECoordination.csproj", "{B705134D-378F-4F39-AEFA-C59A6752AD6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionWrapper", "ExtensionWrapper\ExtensionWrapper.csproj", "{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionLoader", "ExtensionWrapper\ExtensionLoader.csproj", "{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
