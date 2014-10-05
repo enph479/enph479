@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ElectricalToolSuite.MECoordination.UI
@@ -10,7 +11,7 @@ namespace ElectricalToolSuite.MECoordination.UI
             InitializeComponent();
         }
 
-        private void OkButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
         }
