@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using ElectricalToolSuite.MECoordination.UI.Annotations;
 
@@ -71,6 +73,22 @@ namespace ElectricalToolSuite.MECoordination.UI
         public string Name { get; set; }
 
         public ObservableCollection<TreeViewItemWithCheckbox> Children { get; set; }
+
+        public IEnumerable<TreeViewItemWithCheckbox> SelectedWithChildren
+        {
+            get
+            {
+                if (Children != null)
+                {
+                    foreach (var child in Children.SelectMany(child => child.SelectedWithChildren))
+                        yield return child;
+                }
+
+                if (Checked.HasValue && Checked.Value)
+                    yield return this;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

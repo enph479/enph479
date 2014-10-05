@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace ElectricalToolSuite.MECoordination
 {
-    public class ElementIdEqualityComparer<T> : IEqualityComparer<T> where T : Element
+    class XyzAlmostEqualEqualityComparer : IEqualityComparer<XYZ>
     {
-        public bool Equals(T x, T y)
+        public bool Equals(XYZ x, XYZ y)
         {
-            return x.Id == y.Id;
+            return x.IsAlmostEqualTo(y);
         }
 
-        public int GetHashCode(T obj)
+        public int GetHashCode(XYZ obj)
         {
             return obj.GetHashCode();
         }
