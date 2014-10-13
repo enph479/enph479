@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.Creation;
@@ -57,16 +58,21 @@ namespace ElectricalToolSuite.MECoordination
             var mechanicalInstances = GetAllInstances(mechanicalItems);
             var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
 
-            var targetPoints =
-                mechanicalInstances.Select(i => _document.GetElement(i).Location)
-                    .Cast<LocationPoint>()
-                    .Select(lp => lp.Point)
-                    .Distinct(new XyzAlmostEqualEqualityComparer());
+            var targetLocationDatas =
+                (from mechanicalElement in mechanicalInstances
+                let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
+                select new
+                {
+                    ((LocationPoint) mechanicalInstance.Location).Point,
+                    mechanicalInstance.Host,
+                    mechanicalInstance.FacingOrientation
+                }).ToList();
 
-            var familyCreationData = 
+            var familyCreationData =
                 from electricalSymbol in electricalSymbols
-                from targetPoint in targetPoints
-                select new FamilyInstanceCreationData(targetPoint, electricalSymbol, StructuralType.NonStructural);
+                from targetLocationData in targetLocationDatas
+                select
+                    new FamilyInstanceCreationData(targetLocationData.Point, electricalSymbol, StructuralType.NonStructural);                
 
             var familyCreationDataList = familyCreationData.ToList();
             var newItemCount = familyCreationDataList.Count();
@@ -86,7 +92,16 @@ namespace ElectricalToolSuite.MECoordination
 
                 if (confirmationResult == TaskDialogResult.Yes)
                 {
-                    _document.Create.NewFamilyInstances2(familyCreationDataList);
+                    var ids = _document.Create.NewFamilyInstances2(familyCreationDataList);
+                    
+                    foreach (var rotationInformation in ids.Zip(targetLocationDatas, (id, tld) => new {Id = id, tld.Rotation}))
+                    {
+                        var instance = ((FamilyInstance) _document.GetElement(rotationInformation.Id));
+                        var locationPoint = (LocationPoint) instance.Location;
+                        var axis = Line.CreateBound(locationPoint.Point,
+                            new XYZ(locationPoint.Point.X, locationPoint.Point.Y, locationPoint.Point.Z + 10));
+                        instance.Location.Rotate(axis, rotationInformation.Rotation);
+                    }
                 }
             }
         }
