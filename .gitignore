@@ -175,3 +175,4 @@ FakesAssemblies/
 
 # Third party assemblies
 lib/
+src/ExtensionWrapper/App.config
