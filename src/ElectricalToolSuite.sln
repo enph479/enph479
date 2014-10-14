@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MECoordination", "MECoordination\MECoordination.csproj", "{B705134D-378F-4F39-AEFA-C59A6752AD6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionLoader", "ExtensionWrapper\ExtensionLoader.csproj", "{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindAndReplace", "FindAndReplace\FindAndReplace.csproj", "{39C2088F-9B57-401A-AD3F-1389E9C2312D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
