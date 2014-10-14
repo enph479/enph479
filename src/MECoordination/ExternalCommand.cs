@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using RevitExceptions = Autodesk.Revit.Exceptions;
 using Autodesk.Revit.Attributes;
@@ -51,40 +49,7 @@ namespace ElectricalToolSuite.MECoordination
 
             return Result.Succeeded;
         }
-
-        public Result _Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-        {
-            _document = commandData.Application.ActiveUIDocument.Document;
-
-            var categories = _document.Settings.Categories;
-
-            var tagBics = typeof (BuiltInCategory).GetEnumNames()
-                .Where(name => name.EndsWith("Tags"))
-                .Select(name => (BuiltInCategory) Enum.Parse(typeof (BuiltInCategory), name));
-
-            var tagFamilySymbols =
-                tagBics.SelectMany(bic => GetElementsOfType(_document, typeof (FamilySymbol), bic))
-                    .Cast<FamilySymbol>()
-                    .ToList();
-
-            File.WriteAllLines(@"C:\git\enph479\tag_family_symbols.txt", tagFamilySymbols.Select(tfs => String.Format("{0} - {1}", tfs.Family.Name, tfs.Name)));
-
-//            new FilteredElementCollector(_document).Ofcl
-//
-//            var tagCategories =
-//                new FilteredElementCollector(_document)
-//                    .OfClass(typeof (IndependentTag))
-//                    .Cast<IndependentTag>()
-//                    .Select(t => t.Category)
-//                    .Distinct(new CategoryNameEqualityComparer());
-//
-//            File.WriteAllLines(@"C:\git\enph479\tag_categories.txt", tagCategories.Select(tc => tc.Name));
-
-            commandData.Application.PostCommand(RevitCommandId.LookupPostableCommandId(PostableCommand.LoadedTags));
-
-            return Result.Succeeded;
-        }
-
+        
         private IEnumerable<FamilySymbolItem> GetSelectedFamilySymbols(IEnumerable<TreeViewItemWithCheckbox> treeView)
         {
             return treeView.SelectMany(tv => tv.SelectedWithChildren).OfType<FamilySymbolItem>();
@@ -214,30 +179,6 @@ namespace ElectricalToolSuite.MECoordination
                 categoryTreeViewItems.Add(categoryItem);
             }
             return categoryTreeViewItems;
-        }
-
-        private static FilteredElementCollector GetElementsOfType(Document doc, Type type, BuiltInCategory bic)
-        {
-            var collector = new FilteredElementCollector(doc);
-
-            collector.OfCategory(bic);
-            collector.OfClass(type);
-
-            return collector;
-        }
-
-        private static FilteredElementCollector GetFamilySymbols(Document doc, BuiltInCategory bic)
-        {
-            return GetElementsOfType(doc, typeof (FamilySymbol), bic);
-        }
-
-        private static FamilySymbol GetFirstFamilySymbol(Document doc, BuiltInCategory bic)
-        {
-            var s = GetFamilySymbols(doc, bic).FirstElement() as FamilySymbol;
-
-            Debug.Assert(null != s, string.Format("expected at least one {0} symbol in project", bic.ToString()));
-
-            return s;
         }
     }
 }
