@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="ElementCategorizer.cs" />
+    <Compile Include="NullableExtensions.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="UI\FamilySymbolItem.cs" />
     <Compile Include="UI\MainWindow.xaml.cs">
