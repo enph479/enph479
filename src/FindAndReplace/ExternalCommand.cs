@@ -8,34 +8,15 @@ namespace ElectricalToolSuite.FindAndReplace
     [Transaction(TransactionMode.ReadOnly)]
     public class ExternalCommand : IExternalCommand
     {
-        public ElementSet FindMatchingElements(FilteredElementCollector allElements, String matchingString)
-        {
-            var matchingElements = new ElementSet();
-            try
-            {
-                foreach (Element elem in allElements)
-                {
-                    foreach (Parameter param in elem.Parameters)
-                    {
-                        if (!matchingString.Equals(param.AsString()))
-                            continue;
-                        matchingElements.Insert(elem);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-            return matchingElements;
-        }
-
         public Result Execute(ExternalCommandData commandData,
                 ref string message, ElementSet elements)
         {
             try
             {
-                const string matchingString = " 208 V/3-0 VA";
+                var findForm = new FindAndReplaceUi();
+                findForm.ShowDialog();
+                var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings());
+                
                 String info = "the matching elements are: \n";
 
                 var uiDocument = commandData.Application.ActiveUIDocument;
@@ -43,11 +24,11 @@ namespace ElectricalToolSuite.FindAndReplace
 
                 var collector = new FilteredElementCollector(document);
 
-                //currently getting ALL elements is really slow. But who cares, we can fix this later. (threads? filtering? screw the user, who cares about performance?)
+                //currently getting ALL elements is really slow.
                 var allElements = collector.WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false),
                     new ElementIsElementTypeFilter(true)));
 
-                var matchingElements = FindMatchingElements(allElements, matchingString);
+                var matchingElements = textFinder.FindMatchingElements(allElements);
 
                 foreach (Element elem in matchingElements)
                 {
