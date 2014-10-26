@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using ElectricalToolSuite.MECoordination.UI.Annotations;
+using Autodesk.Revit.DB;
 
 namespace ElectricalToolSuite.MECoordination.UI
 {
@@ -12,10 +13,11 @@ namespace ElectricalToolSuite.MECoordination.UI
         private bool? _checked = false;
         private TreeViewItemWithCheckbox _parent;
 
-        public TreeViewItemWithCheckbox(string name)
+        public TreeViewItemWithCheckbox(string name, ElementId id)
         {
             Name = name;
             Children = new ObservableCollection<TreeViewItemWithCheckbox>();
+            ElementId = id;
         }
 
         public bool? Checked
@@ -23,6 +25,19 @@ namespace ElectricalToolSuite.MECoordination.UI
             get { return _checked; }
             set { SetIsChecked(value, true, true); }
         }
+
+        public void SetInitialCheckedState(HashSet<ElementId> checkedIds)
+        {
+            if (checkedIds.Contains(ElementId))
+                SetIsChecked(true, true, true);
+            else
+            {
+                foreach (var child in Children)
+                    child.SetInitialCheckedState(checkedIds);
+            }
+        }
+
+        public ElementId ElementId { get; set; }
 
         private void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
         {

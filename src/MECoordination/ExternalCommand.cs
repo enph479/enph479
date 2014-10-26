@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
-using RevitExceptions = Autodesk.Revit.Exceptions;
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.Creation;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using ElectricalToolSuite.MECoordination.UI;
-using Document = Autodesk.Revit.DB.Document;
-using Autodesk.Revit.DB.Structure;
+using RevitExceptions = Autodesk.Revit.Exceptions;
+using Settings = ElectricalToolSuite.MECoordination.Properties.Settings;
 
 namespace ElectricalToolSuite.MECoordination
 {
     [Transaction(TransactionMode.Automatic)]
     public class ExternalCommand : IExternalCommand
     {
+        private readonly Settings _defaultSettings;
         private Document _document;
+
+        public ExternalCommand()
+        {
+            _defaultSettings = Settings.Default;
+        }
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -23,14 +29,21 @@ namespace ElectricalToolSuite.MECoordination
 
             var familySymbols =
                 new FilteredElementCollector(_document)
-                    .WherePasses(new ElementIsCurveDrivenFilter(inverted: true))
+                    .WherePasses(new ElementIsCurveDrivenFilter(true))
                     // Curve-driven elements do not have LocationPoints.
                     .OfClass(typeof (FamilySymbol))
                     .Cast<FamilySymbol>();
 
-            var categories = new ElementCategorizer().GroupByFamilyAndCategoryNames(familySymbols).ToList();
-            var mechanicalItems = GenerateTreeViewData(categories);
-            var electricalItems = GenerateTreeViewData(categories);
+            var categories =
+                new ElementCategorizer().GroupByFamilyAndCategory(familySymbols);
+            var mechanicalItems = GetFilteredTreeView(categories,
+                _defaultSettings.MechanicalCategories);
+            var electricalItems = GetFilteredTreeView(categories,
+                _defaultSettings.ElectricalCategories);
+
+            if (!TrySetInitialCheckedState(mechanicalItems, _defaultSettings.SelectedMechanicalElements) ||
+                !TrySetInitialCheckedState(electricalItems, _defaultSettings.SelectedElectricalElements))
+                _defaultSettings.Reset();
 
             var mainWindow = new MainWindow(commandData.Application)
             {
@@ -38,7 +51,7 @@ namespace ElectricalToolSuite.MECoordination
                 ElectricalTree = {ItemsSource = electricalItems}
             };
 
-            var accepted = mainWindow.ShowDialog();
+            bool? accepted = mainWindow.ShowDialog();
 
             if (accepted.HasValue && accepted.Value)
             {
@@ -47,9 +60,58 @@ namespace ElectricalToolSuite.MECoordination
                     tagOnPlacement);
             }
 
+            SaveCheckedItems(mechanicalItems, electricalItems);
+
             return Result.Succeeded;
         }
-        
+
+        private void SaveCheckedItems(IEnumerable<TreeViewItemWithCheckbox> mechanicalItems,
+            IEnumerable<TreeViewItemWithCheckbox> electricalItems)
+        {
+            _defaultSettings.SelectedMechanicalElements = String.Join(",",
+                GetSelected(mechanicalItems).Select(i => Convert.ToString(i.IntegerValue)));
+
+            _defaultSettings.SelectedElectricalElements = String.Join(",",
+                GetSelected(electricalItems).Select(i => Convert.ToString(i.IntegerValue)));
+
+            // Ensure the result is parsable
+            if (TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedMechanicalElements) &&
+                TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedElectricalElements))
+                _defaultSettings.Save();
+        }
+
+        private List<TreeViewItemWithCheckbox> GetFilteredTreeView(
+            Dictionary<Category, Dictionary<ElementId, HashSet<ElementId>>> categories, StringCollection names)
+        {
+            var filteredCategories =
+                categories.Where(kvp => names.Contains(kvp.Key.Name));
+            return GetTreeView(_defaultSettings.DebugMode ? categories : filteredCategories);
+        }
+
+        private bool TrySetInitialCheckedState(IEnumerable<TreeViewItemWithCheckbox> treeView, string checkedItemIds)
+        {
+            try
+            {
+                var selectedItemIds =
+                    new HashSet<ElementId>(checkedItemIds.Split(',').Select(Int32.Parse).Select(id => new ElementId(id)));
+                if (!selectedItemIds.Any())
+                    return true;
+                foreach (TreeViewItemWithCheckbox item in treeView)
+                    item.SetInitialCheckedState(selectedItemIds);
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private IEnumerable<ElementId> GetSelected(IEnumerable<TreeViewItemWithCheckbox> treeView)
+        {
+            return treeView.SelectMany(tv => tv.SelectedWithChildren).Select(item => item.ElementId);
+        }
+
         private IEnumerable<FamilySymbolItem> GetSelectedFamilySymbols(IEnumerable<TreeViewItemWithCheckbox> treeView)
         {
             return treeView.SelectMany(tv => tv.SelectedWithChildren).OfType<FamilySymbolItem>();
@@ -58,8 +120,9 @@ namespace ElectricalToolSuite.MECoordination
         private void Synchronize(IEnumerable<FamilySymbolItem> mechanicalItems,
             IEnumerable<FamilySymbolItem> electricalItems, bool tagOnPlacement)
         {
-            var familyCreationData = BuildFamilyCreationData(mechanicalItems, electricalItems);
-            var newItemCount = familyCreationData.Count();
+            var mechanicalInstanceIds = GetAllInstances(mechanicalItems).ToList();
+            var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
+            int newItemCount = mechanicalInstanceIds.Count()*electricalSymbols.Count;
 
             if (newItemCount == 0)
             {
@@ -67,72 +130,72 @@ namespace ElectricalToolSuite.MECoordination
             }
             else
             {
-                CreateInstances(tagOnPlacement, newItemCount, familyCreationData);
-            }
-        }
+                var message = String.Format("This operation will create {0} new {1}. Proceed?", newItemCount,
+                    newItemCount > 1 ? "instances" : "instance");
 
-        private List<FamilyInstanceCreationData> BuildFamilyCreationData(IEnumerable<FamilySymbolItem> mechanicalItems,
-            IEnumerable<FamilySymbolItem> electricalItems)
-        {
-            var mechanicalInstances = GetAllInstances(mechanicalItems);
-            var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
+                const TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
 
-            var targetLocationDatas =
-                from mechanicalElement in mechanicalInstances
-                let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
-                select new
+                var confirmationResult = TaskDialog.Show("Confirm operation", message, buttons);
+
+                if (confirmationResult == TaskDialogResult.Yes)
                 {
-                    ((LocationPoint) mechanicalInstance.Location).Point,
-                    mechanicalInstance.Host,
-                    mechanicalInstance.FacingOrientation
-                };
-
-            var familyCreationData =
-                from electricalSymbol in electricalSymbols
-                from targetLocationData in targetLocationDatas
-                select
-                    new FamilyInstanceCreationData(targetLocationData.Point, electricalSymbol, targetLocationData.Host,
-                        StructuralType.NonStructural);
-
-            return familyCreationData.ToList();
-        }
-
-        private void CreateInstances(bool tagOnPlacement, int newItemCount,
-            List<FamilyInstanceCreationData> familyCreationDataList)
-        {
-            var message = String.Format("This operation will create {0} new {1}. Proceed?", newItemCount,
-                newItemCount > 1 ? "instances" : "instance");
-
-            const TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-
-            var confirmationResult = TaskDialog.Show("Confirm operation", message, buttons);
-
-            if (confirmationResult == TaskDialogResult.Yes)
-            {
-                var instanceIds = _document.Create.NewFamilyInstances2(familyCreationDataList);
-
-                if (tagOnPlacement)
-                {
-                    CreateTags(instanceIds);
+                    CreateInstances(tagOnPlacement, mechanicalInstanceIds, electricalSymbols);
                 }
             }
         }
 
-        private void CreateTags(ICollection<ElementId> instanceIds)
+        private void CreateInstances(bool tagOnPlacement, IEnumerable<ElementId> mechanicalInstanceIds,
+            IEnumerable<FamilySymbol> electricalSymbols)
+        {
+            var targetLocations =
+                (from mechanicalElement in mechanicalInstanceIds
+                    let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
+                    select new
+                    {
+                        ((LocationPoint) mechanicalInstance.Location).Point,
+                        mechanicalInstance.Host,
+                    }).ToList();
+
+            var newInstanceLocations = new List<Tuple<FamilyInstance, XYZ>>();
+            foreach (var electricalSymbol in electricalSymbols)
+            {
+                foreach (var location in targetLocations)
+                {
+                    FamilyInstance newInstance;
+
+                    if (location.Host != null)
+                        newInstance = _document.Create.NewFamilyInstance(location.Point, electricalSymbol,
+                            location.Host,
+                            StructuralType.NonStructural);
+                    else
+                        newInstance = _document.Create.NewFamilyInstance(location.Point, electricalSymbol,
+                            StructuralType.NonStructural);
+
+                    newInstanceLocations.Add(Tuple.Create(newInstance, location.Point));
+                }
+            }
+
+            if (tagOnPlacement)
+            {
+                CreateTags(newInstanceLocations);
+            }
+        }
+
+        private void CreateTags(IEnumerable<Tuple<FamilyInstance, XYZ>> instanceLocations)
         {
             string failureMessage = "";
-
+            bool addLeader = _defaultSettings.UseTagLeaders;
             var currentView = _document.ActiveView;
-            foreach (var instanceId in instanceIds)
+
+            foreach (var tuple in instanceLocations)
             {
-                var instance = (FamilyInstance) _document.GetElement(instanceId);
-                var locationPoint = (LocationPoint) instance.Location;
+                FamilyInstance instance = tuple.Item1;
+                XYZ location = tuple.Item2;
 
                 try
                 {
-                    const bool addLeader = false;
                     _document.Create.NewTag(currentView, instance, addLeader, TagMode.TM_ADDBY_CATEGORY,
-                        TagOrientation.Horizontal, locationPoint.Point);
+                        TagOrientation.Horizontal, location);
                 }
                 catch (RevitExceptions.InvalidOperationException)
                 {
@@ -158,27 +221,35 @@ namespace ElectricalToolSuite.MECoordination
             return new FilteredElementCollector(_document).WherePasses(unionFilter).ToElementIds();
         }
 
-        private static List<TreeViewItemWithCheckbox> GenerateTreeViewData(
-            IEnumerable<IGrouping<string, IGrouping<string, FamilySymbol>>> categories)
+        private List<TreeViewItemWithCheckbox> GetTreeView(
+            Dictionary<Category, Dictionary<ElementId, HashSet<ElementId>>> categories)
         {
             var categoryTreeViewItems = new List<TreeViewItemWithCheckbox>();
 
-            foreach (var categoryGroup in categories)
+            foreach (Category category in categories.Keys.OrderBy(c => c.Name))
             {
-                var categoryItem = new TreeViewItemWithCheckbox(categoryGroup.Key);
-                foreach (var familyGroup in categoryGroup)
+                var categoryItem =
+                    new TreeViewItemWithCheckbox(category.Name, category.Id);
+                foreach (ElementId family in categories[category].Keys.OrderBy(GetElementName))
                 {
-                    var familyItem = new TreeViewItemWithCheckbox(familyGroup.Key);
-                    foreach (var familySymbol in familyGroup)
+                    var familyItem = new TreeViewItemWithCheckbox(_document.GetElement(family).Name, family);
+                    foreach (ElementId familySymbol in categories[category][family].OrderBy(GetElementName))
                     {
-                        var familySymbolItem = new FamilySymbolItem(familySymbol.Name, familySymbol);
+                        var familySymbolItem = new FamilySymbolItem(_document.GetElement(familySymbol).Name,
+                            (FamilySymbol) _document.GetElement(familySymbol));
                         familyItem.AddChild(familySymbolItem);
                     }
                     categoryItem.AddChild(familyItem);
                 }
                 categoryTreeViewItems.Add(categoryItem);
             }
+
             return categoryTreeViewItems;
+        }
+
+        private string GetElementName(ElementId id)
+        {
+            return _document.GetElement(id).Name;
         }
     }
 }

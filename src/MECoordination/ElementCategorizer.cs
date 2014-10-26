@@ -20,5 +20,25 @@ namespace ElectricalToolSuite.MECoordination
             return families.GroupBy(g => g.First().Category.Name)
                 .OrderBy(g => g.Key);
         }
+
+        public Dictionary<Category, Dictionary<ElementId, HashSet<ElementId>>> GroupByFamilyAndCategory(
+            IEnumerable<FamilySymbol> familySymbols)
+        {
+            var categories = new Dictionary<Category, Dictionary<ElementId, HashSet<ElementId>>>(new CategoryIdEqualityComparer());
+
+            foreach (var familySymbol in familySymbols.Where(fs => fs.Category != null))
+            {
+                if (!categories.ContainsKey(familySymbol.Category))
+                    categories.Add(familySymbol.Category, new Dictionary<ElementId, HashSet<ElementId>>());
+
+                if (!categories[familySymbol.Category].ContainsKey(familySymbol.Family.Id))
+                    categories[familySymbol.Category].Add(familySymbol.Family.Id, new HashSet<ElementId>());
+
+                if (!categories[familySymbol.Category][familySymbol.Family.Id].Contains(familySymbol.Id))
+                    categories[familySymbol.Category][familySymbol.Family.Id].Add(familySymbol.Id);
+            }
+
+            return categories;
+        }
     }
 }

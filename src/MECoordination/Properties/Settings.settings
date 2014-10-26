@@ -1,0 +1,72 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ElectricalToolSuite.MECoordination.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="UseTagLeaders" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MechanicalCategories" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;Air Terminals&lt;/string&gt;
+  &lt;string&gt;Areas&lt;/string&gt;
+  &lt;string&gt;Assemblies&lt;/string&gt;
+  &lt;string&gt;Detail Items&lt;/string&gt;
+  &lt;string&gt;Duct Accessories&lt;/string&gt;
+  &lt;string&gt;Duct Fittings&lt;/string&gt;
+  &lt;string&gt;Duct Insulations&lt;/string&gt;
+  &lt;string&gt;Duct Linings&lt;/string&gt;
+  &lt;string&gt;Ducts/Duct Placeholders&lt;/string&gt;
+  &lt;string&gt;Flex Ducts&lt;/string&gt;
+  &lt;string&gt;Generic Models&lt;/string&gt;
+  &lt;string&gt;HVAC Zones&lt;/string&gt;
+  &lt;string&gt;Mass&lt;/string&gt;
+  &lt;string&gt;Mechanical Equipment&lt;/string&gt;
+  &lt;string&gt;Parts&lt;/string&gt;
+  &lt;string&gt;Revision Clouds&lt;/string&gt;
+  &lt;string&gt;Rooms&lt;/string&gt;
+  &lt;string&gt;Sheets&lt;/string&gt;
+  &lt;string&gt;Spaces&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="ElectricalCategories" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;Areas&lt;/string&gt;
+  &lt;string&gt;Assemblies&lt;/string&gt;
+  &lt;string&gt;Cable Tray Fittings&lt;/string&gt;
+  &lt;string&gt;Cable Trays&lt;/string&gt;
+  &lt;string&gt;Communication Devices&lt;/string&gt;
+  &lt;string&gt;Conduit Fittings&lt;/string&gt;
+  &lt;string&gt;Conduits&lt;/string&gt;
+  &lt;string&gt;Data Devices&lt;/string&gt;
+  &lt;string&gt;Detail Items&lt;/string&gt;
+  &lt;string&gt;Electrical Equipment&lt;/string&gt;
+  &lt;string&gt;Electrical Fixtures&lt;/string&gt;
+  &lt;string&gt;Fire Alarm Devices&lt;/string&gt;
+  &lt;string&gt;Generic Models&lt;/string&gt;
+  &lt;string&gt;Lighting Devices&lt;/string&gt;
+  &lt;string&gt;Lighting Fixtures&lt;/string&gt;
+  &lt;string&gt;Mass&lt;/string&gt;
+  &lt;string&gt;Nurse Call Devices&lt;/string&gt;
+  &lt;string&gt;Parts&lt;/string&gt;
+  &lt;string&gt;Revision Clouds&lt;/string&gt;
+  &lt;string&gt;Rooms&lt;/string&gt;
+  &lt;string&gt;Security Devices&lt;/string&gt;
+  &lt;string&gt;Sheets&lt;/string&gt;
+  &lt;string&gt;Spaces&lt;/string&gt;
+  &lt;string&gt;Telephone Devices&lt;/string&gt;
+  &lt;string&gt;Wires&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="DebugMode" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SelectedMechanicalElements" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="SelectedElectricalElements" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

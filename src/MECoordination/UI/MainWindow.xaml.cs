@@ -14,10 +14,10 @@ namespace ElectricalToolSuite.MECoordination.UI
         {
             if (application == null) throw new ArgumentNullException("application");
             _application = application;
-            
+
             InitializeComponent();
         }
-
+        
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
