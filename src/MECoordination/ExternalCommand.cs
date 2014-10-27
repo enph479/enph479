@@ -45,19 +45,25 @@ namespace ElectricalToolSuite.MECoordination
                 !TrySetInitialCheckedState(electricalItems, _defaultSettings.SelectedElectricalElements))
                 _defaultSettings.Reset();
 
+            var allViews = GetAllViews();
+            var currentViewIndex = allViews.FindIndex(view => view.Id == _document.ActiveView.Id);
+
             var mainWindow = new MainWindow(commandData.Application)
             {
-                MechanicalTree = {ItemsSource = mechanicalItems},
-                ElectricalTree = {ItemsSource = electricalItems}
+                MechanicalTree = { ItemsSource = mechanicalItems },
+                ElectricalTree = { ItemsSource = electricalItems },
+                TagViewComboBox = { ItemsSource = allViews, SelectedIndex = currentViewIndex }
             };
 
             bool? accepted = mainWindow.ShowDialog();
 
-            if (accepted.HasValue && accepted.Value)
+            if (accepted.ValueOr(false))
             {
                 bool tagOnPlacement = mainWindow.TagOnPlacementCheckBox.IsChecked.ValueOr(false);
+                var selectedView = tagOnPlacement ? (View) mainWindow.TagViewComboBox.SelectedItem : null;
+
                 Synchronize(GetSelectedFamilySymbols(mechanicalItems), GetSelectedFamilySymbols(electricalItems),
-                    tagOnPlacement);
+                    tagOnPlacement, selectedView);
             }
 
             SaveCheckedItems(mechanicalItems, electricalItems);
@@ -75,8 +81,8 @@ namespace ElectricalToolSuite.MECoordination
                 GetSelected(electricalItems).Select(i => Convert.ToString(i.IntegerValue)));
 
             // Ensure the result is parsable
-            if (TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedMechanicalElements) &&
-                TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedElectricalElements))
+            if (TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedMechanicalElements)
+                && TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedElectricalElements))
                 _defaultSettings.Save();
         }
 
@@ -86,6 +92,16 @@ namespace ElectricalToolSuite.MECoordination
             var filteredCategories =
                 categories.Where(kvp => names.Contains(kvp.Key.Name));
             return GetTreeView(_defaultSettings.DebugMode ? categories : filteredCategories);
+        }
+
+        private List<View> GetAllViews()
+        {
+            return
+                new FilteredElementCollector(_document)
+                    .OfClass(typeof (View))
+                    .Cast<View>()
+                    .OrderBy(view => view.ViewName)
+                    .ToList();
         }
 
         private bool TrySetInitialCheckedState(IEnumerable<TreeViewItemWithCheckbox> treeView, string checkedItemIds)
@@ -118,7 +134,7 @@ namespace ElectricalToolSuite.MECoordination
         }
 
         private void Synchronize(IEnumerable<FamilySymbolItem> mechanicalItems,
-            IEnumerable<FamilySymbolItem> electricalItems, bool tagOnPlacement)
+            IEnumerable<FamilySymbolItem> electricalItems, bool tagOnPlacement, View tagView)
         {
             var mechanicalInstanceIds = GetAllInstances(mechanicalItems).ToList();
             var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
@@ -139,22 +155,22 @@ namespace ElectricalToolSuite.MECoordination
 
                 if (confirmationResult == TaskDialogResult.Yes)
                 {
-                    CreateInstances(tagOnPlacement, mechanicalInstanceIds, electricalSymbols);
+                    CreateInstances(tagOnPlacement, mechanicalInstanceIds, electricalSymbols, tagView);
                 }
             }
         }
 
         private void CreateInstances(bool tagOnPlacement, IEnumerable<ElementId> mechanicalInstanceIds,
-            IEnumerable<FamilySymbol> electricalSymbols)
+            IEnumerable<FamilySymbol> electricalSymbols, View tagView)
         {
             var targetLocations =
                 (from mechanicalElement in mechanicalInstanceIds
-                    let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
-                    select new
-                    {
-                        ((LocationPoint) mechanicalInstance.Location).Point,
-                        mechanicalInstance.Host,
-                    }).ToList();
+                 let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
+                 select new
+                 {
+                     ((LocationPoint) mechanicalInstance.Location).Point,
+                     mechanicalInstance.Host,
+                 }).ToList();
 
             var newInstanceLocations = new List<Tuple<FamilyInstance, XYZ>>();
             foreach (var electricalSymbol in electricalSymbols)
@@ -177,15 +193,14 @@ namespace ElectricalToolSuite.MECoordination
 
             if (tagOnPlacement)
             {
-                CreateTags(newInstanceLocations);
+                CreateTags(newInstanceLocations, tagView);
             }
         }
 
-        private void CreateTags(IEnumerable<Tuple<FamilyInstance, XYZ>> instanceLocations)
+        private void CreateTags(IEnumerable<Tuple<FamilyInstance, XYZ>> instanceLocations, View view)
         {
             string failureMessage = "";
             bool addLeader = _defaultSettings.UseTagLeaders;
-            var currentView = _document.ActiveView;
 
             foreach (var tuple in instanceLocations)
             {
@@ -194,7 +209,7 @@ namespace ElectricalToolSuite.MECoordination
 
                 try
                 {
-                    _document.Create.NewTag(currentView, instance, addLeader, TagMode.TM_ADDBY_CATEGORY,
+                    _document.Create.NewTag(view, instance, addLeader, TagMode.TM_ADDBY_CATEGORY,
                         TagOrientation.Horizontal, location);
                 }
                 catch (RevitExceptions.InvalidOperationException)
