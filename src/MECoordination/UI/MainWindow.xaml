@@ -59,7 +59,9 @@
         <CheckBox x:Name="TagOnPlacementCheckBox" Content="Tag on placement" HorizontalAlignment="Left" Margin="89,0,0,-25" VerticalAlignment="Bottom"/>
         <ComboBox x:Name="TagViewComboBox" HorizontalAlignment="Left" Margin="281,0,0,-29" VerticalAlignment="Bottom"
                   DisplayMemberPath="ViewName"
+                  IsEnabled="{Binding ElementName=TagOnPlacementCheckBox, Path=IsChecked}"
                   />
-        <Label Content="Tag view:" HorizontalAlignment="Left" Margin="219,0,0,-31" VerticalAlignment="Bottom"/>
+        <Label Content="Tag view:" HorizontalAlignment="Left" Margin="219,0,0,-31" VerticalAlignment="Bottom"
+               IsEnabled="{Binding ElementName=TagOnPlacementCheckBox, Path=IsChecked}"/>
     </Grid>
 </Window>
