@@ -59,14 +59,14 @@
   &lt;string&gt;Wires&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
-    <Setting Name="DebugMode" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="SelectedMechanicalElements" Type="System.String" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="SelectedElectricalElements" Type="System.String" Scope="User">
       <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="DebugMode" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

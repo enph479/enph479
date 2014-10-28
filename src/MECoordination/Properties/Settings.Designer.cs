@@ -98,15 +98,6 @@ namespace ElectricalToolSuite.MECoordination.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool DebugMode {
-            get {
-                return ((bool)(this["DebugMode"]));
-            }
-        }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-1")]
@@ -128,6 +119,15 @@ namespace ElectricalToolSuite.MECoordination.Properties {
             }
             set {
                 this["SelectedElectricalElements"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DebugMode {
+            get {
+                return ((bool)(this["DebugMode"]));
             }
         }
     }

@@ -57,20 +57,12 @@
         <Button x:Name="OkButton" Content="OK" Margin="0,0,102,-28" IsDefault="True" Click="OkButton_Click" Command="ApplicationCommands.Close" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Grid.Column="1"/>
         <Button x:Name="TagsButton" Content="Tags..." HorizontalAlignment="Left" Margin="20,0,0,-28" Width="50" Click="TagsButtonClick" VerticalAlignment="Bottom" Height="25"/>
         <CheckBox x:Name="TagOnPlacementCheckBox" Content="Tag on placement" HorizontalAlignment="Left" Margin="89,0,0,-23" VerticalAlignment="Bottom"/>
-        <ComboBox x:Name="TagViewComboBox" Margin="283,0,0,-28" VerticalAlignment="Bottom"
-                  DisplayMemberPath="ViewName"
-                  IsEnabled="{Binding ElementName=TagOnPlacementCheckBox, Path=IsChecked}" MaxWidth="300" Height="25" HorizontalAlignment="Left" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2"
+        <ComboBox x:Name="WorksetComboBox" Margin="283,0,0,-28" VerticalAlignment="Bottom"
+                  DisplayMemberPath="Name"
+                  MaxWidth="300" Height="25" HorizontalAlignment="Left" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2"
                   >
-            <ComboBox.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="0.44"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </ComboBox.RenderTransform>
         </ComboBox>
-        <Label Content="Tag view:" HorizontalAlignment="Left" Margin="219,0,0,-28" VerticalAlignment="Bottom"
-               IsEnabled="{Binding ElementName=TagOnPlacementCheckBox, Path=IsChecked}"/>
+        <Label Content="Workset:" HorizontalAlignment="Left" Margin="219,0,0,-28" VerticalAlignment="Bottom"
+               />
     </Grid>
 </Window>

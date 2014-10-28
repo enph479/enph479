@@ -45,14 +45,15 @@ namespace ElectricalToolSuite.MECoordination
                 !TrySetInitialCheckedState(electricalItems, _defaultSettings.SelectedElectricalElements))
                 _defaultSettings.Reset();
 
-            var allViews = GetAllViews();
-            var currentViewIndex = allViews.FindIndex(view => view.Id == _document.ActiveView.Id);
+            var userWorksets = GetAllUserWorksets();
+            var activeWorksetId = _document.GetWorksetTable().GetActiveWorksetId();
+            var currentWorksetIndex = userWorksets.FindIndex(workset => workset.Id == activeWorksetId);
 
             var mainWindow = new MainWindow(commandData.Application)
             {
                 MechanicalTree = { ItemsSource = mechanicalItems },
                 ElectricalTree = { ItemsSource = electricalItems },
-                TagViewComboBox = { ItemsSource = allViews, SelectedIndex = currentViewIndex }
+                WorksetComboBox = { ItemsSource = userWorksets, SelectedIndex = currentWorksetIndex }
             };
 
             bool? accepted = mainWindow.ShowDialog();
@@ -60,15 +61,22 @@ namespace ElectricalToolSuite.MECoordination
             if (accepted.ValueOr(false))
             {
                 bool tagOnPlacement = mainWindow.TagOnPlacementCheckBox.IsChecked.ValueOr(false);
-                var selectedView = tagOnPlacement ? (View) mainWindow.TagViewComboBox.SelectedItem : null;
+                var selectedWorkset = (Workset) mainWindow.WorksetComboBox.SelectedItem;
 
                 Synchronize(GetSelectedFamilySymbols(mechanicalItems), GetSelectedFamilySymbols(electricalItems),
-                    tagOnPlacement, selectedView);
+                    tagOnPlacement, selectedWorkset);
             }
 
             SaveCheckedItems(mechanicalItems, electricalItems);
 
             return Result.Succeeded;
+        }
+
+        private List<Workset> GetAllUserWorksets()
+        {
+            return new FilteredWorksetCollector(_document)
+                .OfKind(WorksetKind.UserWorkset)
+                .ToList();
         }
 
         private void SaveCheckedItems(IEnumerable<TreeViewItemWithCheckbox> mechanicalItems,
@@ -134,7 +142,7 @@ namespace ElectricalToolSuite.MECoordination
         }
 
         private void Synchronize(IEnumerable<FamilySymbolItem> mechanicalItems,
-            IEnumerable<FamilySymbolItem> electricalItems, bool tagOnPlacement, View tagView)
+            IEnumerable<FamilySymbolItem> electricalItems, bool tagOnPlacement, Workset workset)
         {
             var mechanicalInstanceIds = GetAllInstances(mechanicalItems).ToList();
             var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
@@ -155,13 +163,13 @@ namespace ElectricalToolSuite.MECoordination
 
                 if (confirmationResult == TaskDialogResult.Yes)
                 {
-                    CreateInstances(tagOnPlacement, mechanicalInstanceIds, electricalSymbols, tagView);
+                    CreateInstances(tagOnPlacement, mechanicalInstanceIds, electricalSymbols, workset);
                 }
             }
         }
 
         private void CreateInstances(bool tagOnPlacement, IEnumerable<ElementId> mechanicalInstanceIds,
-            IEnumerable<FamilySymbol> electricalSymbols, View tagView)
+            IEnumerable<FamilySymbol> electricalSymbols, Workset workset)
         {
             var targetLocations =
                 (from mechanicalElement in mechanicalInstanceIds
@@ -187,14 +195,17 @@ namespace ElectricalToolSuite.MECoordination
                         newInstance = _document.Create.NewFamilyInstance(location.Point, electricalSymbol,
                             StructuralType.NonStructural);
 
+                    var worksetParameter = newInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
+                    worksetParameter.Set(workset.Id.IntegerValue);
+
                     newInstanceLocations.Add(Tuple.Create(newInstance, location.Point));
                 }
             }
 
-            if (tagOnPlacement)
-            {
-                CreateTags(newInstanceLocations, tagView);
-            }
+//            if (tagOnPlacement)
+//            {
+//                CreateTags(newInstanceLocations, tagView);
+//            }
         }
 
         private void CreateTags(IEnumerable<Tuple<FamilyInstance, XYZ>> instanceLocations, View view)

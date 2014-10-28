@@ -31,7 +31,7 @@ namespace ElectricalToolSuite.MECoordination.UI
         {
             e.CanExecute = MechanicalTree.Items.Cast<TreeViewItemWithCheckbox>().SelectMany(i => i.SelectedWithChildren).Any()
                 && ElectricalTree.Items.Cast<TreeViewItemWithCheckbox>().SelectMany(i => i.SelectedWithChildren).Any()
-                && (!TagOnPlacementCheckBox.IsChecked.ValueOr(false) || TagViewComboBox.SelectedItem != null);
+                && (!TagOnPlacementCheckBox.IsChecked.ValueOr(false) || WorksetComboBox.SelectedItem != null);
         }
 
         private void TagsButtonClick(object sender, RoutedEventArgs e)
