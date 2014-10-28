@@ -60,10 +60,11 @@ namespace ElectricalToolSuite.MECoordination
 
             if (accepted.ValueOr(false))
             {
+                bool tagOnPlacement = mainWindow.TagOnPlacementCheckBox.IsChecked.ValueOr(false);
                 var selectedWorkset = (Workset) mainWindow.WorksetComboBox.SelectedItem;
 
-                Synchronize(GetSelectedFamilySymbols(mechanicalItems), GetSelectedFamilySymbols(electricalItems), 
-                    selectedWorkset);
+                Synchronize(GetSelectedFamilySymbols(mechanicalItems), GetSelectedFamilySymbols(electricalItems),
+                    tagOnPlacement, selectedWorkset);
             }
 
             SaveCheckedItems(mechanicalItems, electricalItems);
@@ -141,7 +142,7 @@ namespace ElectricalToolSuite.MECoordination
         }
 
         private void Synchronize(IEnumerable<FamilySymbolItem> mechanicalItems,
-            IEnumerable<FamilySymbolItem> electricalItems, Workset workset)
+            IEnumerable<FamilySymbolItem> electricalItems, bool tagOnPlacement, Workset workset)
         {
             var mechanicalInstanceIds = GetAllInstances(mechanicalItems).ToList();
             var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
@@ -162,12 +163,12 @@ namespace ElectricalToolSuite.MECoordination
 
                 if (confirmationResult == TaskDialogResult.Yes)
                 {
-                    CreateInstances(mechanicalInstanceIds, electricalSymbols, workset);
+                    CreateInstances(tagOnPlacement, mechanicalInstanceIds, electricalSymbols, workset);
                 }
             }
         }
 
-        private void CreateInstances(IEnumerable<ElementId> mechanicalInstanceIds,
+        private void CreateInstances(bool tagOnPlacement, IEnumerable<ElementId> mechanicalInstanceIds,
             IEnumerable<FamilySymbol> electricalSymbols, Workset workset)
         {
             var targetInformation =
@@ -195,19 +196,23 @@ namespace ElectricalToolSuite.MECoordination
                         newInstance = _document.Create.NewFamilyInstance(targetInfo.Point, electricalSymbol,
                             StructuralType.NonStructural);
 
+<<<<<<< HEAD
                     CopyMatchingParameters(targetInfo.Parameters, newInstance);
 
-                    SetElementWorkset(workset, newInstance);
-
                     newInstanceLocations.Add(Tuple.Create(newInstance, targetInfo.Point));
+=======
+                    var worksetParameter = newInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
+                    worksetParameter.Set(workset.Id.IntegerValue);
+
+                    newInstanceLocations.Add(Tuple.Create(newInstance, location.Point));
+>>>>>>> WorksetStuff
                 }
             }
-        }
 
-        private static void SetElementWorkset(Workset workset, FamilyInstance newInstance)
-        {
-            var worksetParameter = newInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
-            worksetParameter.Set(workset.Id.IntegerValue);
+//            if (tagOnPlacement)
+//            {
+//                CreateTags(newInstanceLocations, tagView);
+//            }
         }
 
         private static void CopyMatchingParameters(IList<Parameter> targetParameters, FamilyInstance newInstance)
