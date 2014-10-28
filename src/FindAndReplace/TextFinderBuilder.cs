@@ -10,7 +10,7 @@ namespace ElectricalToolSuite.FindAndReplace
     {
         public static TextFinder BuildTextFinder(FinderSettings finderSettings)
         {
-            return new TextFinder(finderSettings._searchText);
+            return new TextFinder(finderSettings.SearchText);
         }
 
     }

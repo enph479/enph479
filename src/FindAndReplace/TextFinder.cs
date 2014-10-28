@@ -18,7 +18,7 @@ namespace ElectricalToolSuite.FindAndReplace
             {
                 foreach (Parameter param in elem.Parameters)
                 {
-                    if (param.AsString().Contains(_searchText))
+                    if (!String.IsNullOrEmpty(param.AsString()) && param.AsString().Contains(_searchText))
                     {
                         matchingElements.Insert(elem);
                     }

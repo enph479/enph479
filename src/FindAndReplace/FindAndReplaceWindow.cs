@@ -4,11 +4,11 @@ using System.Windows.Forms;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
-    public partial class FindAndReplaceUi : Form
+    public partial class FindAndReplaceWindow : Form
     {
 
         private readonly FinderSettings _finderSettings; 
-        public FindAndReplaceUi()
+        public FindAndReplaceWindow()
         {
             InitializeComponent();
             _finderSettings = new FinderSettings();
@@ -16,48 +16,48 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private void FindTextBox_TextChanged(object sender, EventArgs e)
         {
-            _finderSettings._searchText = FindTextBox.Text;
+            _finderSettings.SearchText = FindTextBox.Text;
         }
 
         private void ReplaceTextBox_TextChanged(object sender, EventArgs e)
         {
-            _finderSettings._replaceText = ReplaceTextBox.Text;
+            _finderSettings.ReplaceText = ReplaceTextBox.Text;
         }
 
         private void CaseSensitiveCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._caseSensitive = CaseSensitiveCheckBox.Checked;
+            _finderSettings.CaseSensitive = CaseSensitiveCheckBox.Checked;
         }
 
         private void SelectedViewsRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._searchViewFilter = SearchViewSettings.SelectedView;
+            _finderSettings.SearchViewFilter = SearchViewSettings.SelectedView;
             //TODO: for selected views make it so a new dialog box appears to selected the selected views 
         }
 
         private void WholeWordsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._wholeWords = WholeWordsCheckBox.Checked;
+            _finderSettings.WholeWords = WholeWordsCheckBox.Checked;
         }
 
         private void HiddenElementCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._hiddenElements = HiddenElementCheckBox.Checked;
+            _finderSettings.HiddenElements = HiddenElementCheckBox.Checked;
         }
 
         private void DimensionCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._dimensionText = DimensionCheckBox.Checked;
+            _finderSettings.DimensionText = DimensionCheckBox.Checked;
         }
 
         private void TableTextCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._includeTableText = TableTextCheckBox.Checked;
+            _finderSettings.IncludeTableText = TableTextCheckBox.Checked;
         }
 
         private void FamilyPropertiesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._familyProperties = FamilyPropertiesCheckBox.Checked;
+            _finderSettings.FamilyProperties = FamilyPropertiesCheckBox.Checked;
         }
 
         private void FindButton_Click(object sender, EventArgs e)
@@ -78,12 +78,12 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private void CurrentViewRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._searchViewFilter = SearchViewSettings.CurrentView;
+            _finderSettings.SearchViewFilter = SearchViewSettings.CurrentView;
         }
 
         private void EntireProjectRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings._searchViewFilter = SearchViewSettings.AllViews;
+            _finderSettings.SearchViewFilter = SearchViewSettings.AllViews;
         }
 
         private void Form1_Load(object sender, EventArgs e)

@@ -2,7 +2,7 @@
 
 namespace ElectricalToolSuite.FindAndReplace
 {
-    partial class FindAndReplaceUi
+    partial class FindAndReplaceWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -269,7 +269,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.SelectedViewsRadioButton.UseVisualStyleBackColor = true;
             this.SelectedViewsRadioButton.CheckedChanged += new System.EventHandler(this.SelectedViewsRadioButton_CheckedChanged);
             // 
-            // FindAndReplaceUi
+            // FindAndReplaceWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -277,7 +277,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.Controls.Add(this.TableLayoutPanel);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FindAndReplaceUi";
+            this.Name = "FindAndReplaceWindow";
             this.Text = "Find and Replace";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.TableLayoutPanel.ResumeLayout(false);

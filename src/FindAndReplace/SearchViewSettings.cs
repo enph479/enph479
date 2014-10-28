@@ -1,4 +1,4 @@
 ﻿namespace ElectricalToolSuite.FindAndReplace
 {
-    public enum SearchViewSettings { CurrentView, SelectedView, AllViews };
+    public enum SearchViewSettings { Unknown, CurrentView, SelectedView, AllViews };
 }
