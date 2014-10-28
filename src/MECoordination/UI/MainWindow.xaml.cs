@@ -16,6 +16,9 @@ namespace ElectricalToolSuite.MECoordination.UI
             _application = application;
 
             InitializeComponent();
+
+            MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
+            MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
         }
         
         private void OkButton_Click(object sender, RoutedEventArgs e)
