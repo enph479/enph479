@@ -27,6 +27,7 @@ namespace ElectricalToolSuite.FindAndReplace
             var matchingElements = textFinder.FindMatchingElements(allElements);
 
             var resultsForm = new FindResultsWindow();
+            resultsForm.SelectedElements = uiDocument.Selection.Elements;
             resultsForm.UpdateElements(matchingElements);
             resultsForm.ShowDialog();
 

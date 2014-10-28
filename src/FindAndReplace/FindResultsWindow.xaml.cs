@@ -13,7 +13,6 @@ namespace ElectricalToolSuite.FindAndReplace
     public partial class FindResultsWindow
     {
         public SelElementSet SelectedElements { get; set; }
-        public UIDocument UiDoc { get; set; }
         public FindResultsWindow()
         {
             InitializeComponent();
@@ -29,7 +28,7 @@ namespace ElectricalToolSuite.FindAndReplace
         {
             var castedSender = ((ListBox) sender);
             var t = ((Element) castedSender.SelectedItem);
-            this.SelectedElements = UiDoc.Selection.Elements;
+            SelectedElements.Clear();
             SelectedElements.Insert(t);
             Close();
         } 
