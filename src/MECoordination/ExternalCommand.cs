@@ -163,37 +163,73 @@ namespace ElectricalToolSuite.MECoordination
         private void CreateInstances(bool tagOnPlacement, IEnumerable<ElementId> mechanicalInstanceIds,
             IEnumerable<FamilySymbol> electricalSymbols, View tagView)
         {
-            var targetLocations =
+            var targetInformation =
                 (from mechanicalElement in mechanicalInstanceIds
                  let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
                  select new
                  {
                      ((LocationPoint) mechanicalInstance.Location).Point,
                      mechanicalInstance.Host,
+                     Parameters = mechanicalInstance.GetOrderedParameters()
                  }).ToList();
 
             var newInstanceLocations = new List<Tuple<FamilyInstance, XYZ>>();
             foreach (var electricalSymbol in electricalSymbols)
             {
-                foreach (var location in targetLocations)
+                foreach (var targetInfo in targetInformation)
                 {
                     FamilyInstance newInstance;
 
-                    if (location.Host != null)
-                        newInstance = _document.Create.NewFamilyInstance(location.Point, electricalSymbol,
-                            location.Host,
+                    if (targetInfo.Host != null)
+                        newInstance = _document.Create.NewFamilyInstance(targetInfo.Point, electricalSymbol,
+                            targetInfo.Host,
                             StructuralType.NonStructural);
                     else
-                        newInstance = _document.Create.NewFamilyInstance(location.Point, electricalSymbol,
+                        newInstance = _document.Create.NewFamilyInstance(targetInfo.Point, electricalSymbol,
                             StructuralType.NonStructural);
 
-                    newInstanceLocations.Add(Tuple.Create(newInstance, location.Point));
+                    CopyMatchingParameters(targetInfo.Parameters, newInstance);
+
+                    newInstanceLocations.Add(Tuple.Create(newInstance, targetInfo.Point));
                 }
             }
 
             if (tagOnPlacement)
             {
                 CreateTags(newInstanceLocations, tagView);
+            }
+        }
+
+        private static void CopyMatchingParameters(IList<Parameter> targetParameters, FamilyInstance newInstance)
+        {
+            foreach (Parameter targetParameter in targetParameters)
+            {
+                Parameter newInstanceParameter = newInstance.LookupParameter(targetParameter.Definition.Name);
+                if (newInstanceParameter != null && !newInstanceParameter.IsReadOnly)
+                {
+                    CopyParameterValue(targetParameter, newInstanceParameter);
+                }
+            }
+        }
+
+        private static void CopyParameterValue(Parameter targetParameter, Parameter newInstanceParameter)
+        {
+            switch (targetParameter.StorageType)
+            {
+                case StorageType.Double:
+                    newInstanceParameter.Set(targetParameter.AsDouble());
+                    break;
+                case StorageType.ElementId:
+                    newInstanceParameter.Set(targetParameter.AsElementId());
+                    break;
+                case StorageType.Integer:
+                    newInstanceParameter.Set(targetParameter.AsInteger());
+                    break;
+                case StorageType.String:
+                    newInstanceParameter.Set(targetParameter.AsString());
+                    break;
+                default:
+                    return;
             }
         }
 

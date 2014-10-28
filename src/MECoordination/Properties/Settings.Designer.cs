@@ -100,7 +100,7 @@ namespace ElectricalToolSuite.MECoordination.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool DebugMode {
             get {
                 return ((bool)(this["DebugMode"]));
