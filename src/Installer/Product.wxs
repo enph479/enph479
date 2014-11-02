@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Revit 2015 Electrical Tool Suite" Language="1033" Version="0.1.0.0" Manufacturer="ENPH 479" UpgradeCode="da7696ef-0fd5-4edb-8aa7-683a4be0e6c0">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate />
+
+    <UIRef Id="WixUI_InstallDir" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="AutodeskFolder" Name="Autodesk">
+          <Directory Id="RevitFolder" Name="Revit">
+            <Directory Id="AddinsFolder" Name="Addins">
+              <Directory Id="AddinsInstallDir" Name="2015">
+                <Component Id="ApplicationFiles" Guid="12345678-1234-1234-1234-222222222222">
+                  <File Id="MECoordinationAssembly" Name="$(var.MECoordination.TargetFileName)" Source="$(var.MECoordination.TargetPath)" DiskId="1" />
+                </Component>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="AddinsInstallDir" />
+    <Feature Id="DefaultFeature" Level="1">
+      <ComponentRef Id="ApplicationFiles"/>
+    </Feature>
+
+  </Product>
+</Wix>
