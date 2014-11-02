@@ -50,9 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CategoryIdEqualityComparer.cs" />
-    <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="DocumentAccess.cs" />
     <Compile Include="ExternalCommand.cs" />
-    <Compile Include="ElementCategorizer.cs" />
+    <Compile Include="FamilyIdEqualityComparer.cs" />
+    <Compile Include="IndexedElementLookup.cs" />
+    <Compile Include="MechanicalElectricalEquipmentCoordinator.cs" />
     <Compile Include="NullableExtensions.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -65,7 +67,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\TreeViewItemWithCheckbox.cs" />
-    <Compile Include="XyzAlmostEqualEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

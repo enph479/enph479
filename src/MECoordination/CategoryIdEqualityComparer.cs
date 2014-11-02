@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using System;
 using System.Collections.Generic;
 
 namespace ElectricalToolSuite.MECoordination
@@ -8,7 +7,7 @@ namespace ElectricalToolSuite.MECoordination
     {
         public bool Equals(Category x, Category y)
         {
-            return x.Id.Equals(y.Id);
+            return x.Id.IntegerValue == y.Id.IntegerValue;
         }
 
         public int GetHashCode(Category obj)

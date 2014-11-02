@@ -4,10 +4,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using ElectricalToolSuite.MECoordination.UI;
-using RevitExceptions = Autodesk.Revit.Exceptions;
 using Settings = ElectricalToolSuite.MECoordination.Properties.Settings;
 
 namespace ElectricalToolSuite.MECoordination
@@ -16,7 +14,7 @@ namespace ElectricalToolSuite.MECoordination
     public class ExternalCommand : IExternalCommand
     {
         private readonly Settings _defaultSettings;
-        private Document _document;
+        private DocumentAccess _document;
 
         public ExternalCommand()
         {
@@ -25,57 +23,46 @@ namespace ElectricalToolSuite.MECoordination
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            _document = commandData.Application.ActiveUIDocument.Document;
+            _document = new DocumentAccess(commandData.Application.ActiveUIDocument.Document);
 
-            var familySymbols =
-                new FilteredElementCollector(_document)
-                    .WherePasses(new ElementIsCurveDrivenFilter(true))
-                    // Curve-driven elements do not have LocationPoints.
-                    .OfClass(typeof (FamilySymbol))
-                    .Cast<FamilySymbol>();
+            var mechanicalTree = GetTreeView(_defaultSettings.MechanicalCategories);
+            var electricalTree = GetTreeView(_defaultSettings.ElectricalCategories);
 
-            var categories =
-                new ElementCategorizer().GroupByFamilyAndCategory(familySymbols);
-            var mechanicalItems = GetFilteredTreeView(categories,
-                _defaultSettings.MechanicalCategories);
-            var electricalItems = GetFilteredTreeView(categories,
-                _defaultSettings.ElectricalCategories);
+            SetInitialCheckedState(mechanicalTree, _defaultSettings.SelectedMechanicalElements);
+            SetInitialCheckedState(electricalTree, _defaultSettings.SelectedElectricalElements);
 
-            if (!TrySetInitialCheckedState(mechanicalItems, _defaultSettings.SelectedMechanicalElements) ||
-                !TrySetInitialCheckedState(electricalItems, _defaultSettings.SelectedElectricalElements))
-                _defaultSettings.Reset();
-
-            var userWorksets = GetAllUserWorksets();
-            var activeWorksetId = _document.GetWorksetTable().GetActiveWorksetId();
+            var userWorksets = _document.UserWorksets;
+            var activeWorksetId = _document.ActiveWorksetId;
             var currentWorksetIndex = userWorksets.FindIndex(workset => workset.Id == activeWorksetId);
 
-            var mainWindow = new MainWindow(commandData.Application)
+            var mainWindow = new MainWindow
             {
-                MechanicalTree = { ItemsSource = mechanicalItems },
-                ElectricalTree = { ItemsSource = electricalItems },
+                MechanicalTree = { ItemsSource = mechanicalTree },
+                ElectricalTree = { ItemsSource = electricalTree },
                 WorksetComboBox = { ItemsSource = userWorksets, SelectedIndex = currentWorksetIndex }
             };
 
             bool? accepted = mainWindow.ShowDialog();
-
             if (accepted.ValueOr(false))
             {
-                var selectedWorkset = (Workset) mainWindow.WorksetComboBox.SelectedItem;
+                var selectedWorkset = (Workset)mainWindow.WorksetComboBox.SelectedItem;
+                var selectedMechanical = GetSelectedFamilySymbols(mechanicalTree);
+                var selectedElectrical = GetSelectedFamilySymbols(electricalTree);
 
-                Synchronize(GetSelectedFamilySymbols(mechanicalItems), GetSelectedFamilySymbols(electricalItems), 
-                    selectedWorkset);
+                var mechanicalInstanceIds
+                    = _document.GetInstancesOfFamilySymbols(selectedMechanical)
+                               .ToList();
+
+                if (ConfirmOperation(mechanicalInstanceIds, selectedElectrical))
+                {
+                    var coordinator = new MechanicalElectricalEquipmentCoordinator(_document, selectedWorkset);
+                    coordinator.Coordinate(mechanicalInstanceIds, selectedElectrical);
+                }
             }
 
-            SaveCheckedItems(mechanicalItems, electricalItems);
+            SaveCheckedItems(mechanicalTree, electricalTree);
 
             return Result.Succeeded;
-        }
-
-        private List<Workset> GetAllUserWorksets()
-        {
-            return new FilteredWorksetCollector(_document)
-                .OfKind(WorksetKind.UserWorkset)
-                .ToList();
         }
 
         private void SaveCheckedItems(IEnumerable<TreeViewItemWithCheckbox> mechanicalItems,
@@ -85,49 +72,51 @@ namespace ElectricalToolSuite.MECoordination
                 GetSelected(mechanicalItems).Select(i => Convert.ToString(i.IntegerValue)));
 
             _defaultSettings.SelectedElectricalElements = String.Join(",",
-                GetSelected(electricalItems).Select(i => Convert.ToString(i.IntegerValue)));
-
-            // Ensure the result is parsable
-            if (TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedMechanicalElements)
-                && TrySetInitialCheckedState(Enumerable.Empty<TreeViewItemWithCheckbox>(), _defaultSettings.SelectedElectricalElements))
-                _defaultSettings.Save();
+               GetSelected(electricalItems).Select(i => Convert.ToString(i.IntegerValue)));
+            
+            _defaultSettings.Save();
         }
 
-        private List<TreeViewItemWithCheckbox> GetFilteredTreeView(
-            Dictionary<Category, Dictionary<ElementId, HashSet<ElementId>>> categories, StringCollection names)
+        private List<TreeViewItemWithCheckbox> GetTreeView(StringCollection names)
         {
-            var filteredCategories =
-                categories.Where(kvp => names.Contains(kvp.Key.Name));
-            return GetTreeView(_defaultSettings.DebugMode ? categories : filteredCategories);
-        }
+            var lookup = new IndexedElementLookup(_document);
+            var treeViews = new List<TreeViewItemWithCheckbox>();
 
-        private List<View> GetAllViews()
-        {
-            return
-                new FilteredElementCollector(_document)
-                    .OfClass(typeof (View))
-                    .Cast<View>()
-                    .OrderBy(view => view.ViewName)
-                    .ToList();
-        }
+            var categoryGroups = _defaultSettings.DebugMode
+                ? lookup.FamilyLookup
+                : lookup.FamilyLookup.Where(grp => names.Contains(grp.Key.Name));
 
-        private bool TrySetInitialCheckedState(IEnumerable<TreeViewItemWithCheckbox> treeView, string checkedItemIds)
-        {
-            try
+            foreach (var categoryGroup in categoryGroups.OrderBy(grp => grp.Key.Name))
             {
-                var selectedItemIds =
-                    new HashSet<ElementId>(checkedItemIds.Split(',').Select(Int32.Parse).Select(id => new ElementId(id)));
-                if (!selectedItemIds.Any())
-                    return true;
-                foreach (TreeViewItemWithCheckbox item in treeView)
-                    item.SetInitialCheckedState(selectedItemIds);
-            }
-            catch (FormatException)
-            {
-                return false;
+                var category = categoryGroup.Key;
+                var categoryTreeView = new TreeViewItemWithCheckbox(category.Name, category.Id);
+                treeViews.Add(categoryTreeView);
+
+                foreach (var family in categoryGroup.OrderBy(f => f.Name))
+                {
+                    var familyTreeView = new TreeViewItemWithCheckbox(family.Name, family.Id);
+                    categoryTreeView.AddChild(familyTreeView);
+
+                    foreach (var symbol in lookup.SymbolLookup[family].OrderBy(s => s.Name))
+                    {
+                        familyTreeView.AddChild(new FamilySymbolItem(symbol.Name, symbol));
+                    }
+                }
             }
 
-            return true;
+            return treeViews;
+        }
+
+        private void SetInitialCheckedState(IEnumerable<TreeViewItemWithCheckbox> treeView, string checkedItemIds)
+        {
+            if (String.IsNullOrWhiteSpace(checkedItemIds))
+                return;
+
+            var selectedItemIds
+                = new HashSet<ElementId>(checkedItemIds.Split(',').Select(Int32.Parse).Select(id => new ElementId(id)));
+
+            foreach (TreeViewItemWithCheckbox item in treeView)
+                item.SetInitialCheckedState(selectedItemIds);
         }
 
         private IEnumerable<ElementId> GetSelected(IEnumerable<TreeViewItemWithCheckbox> treeView)
@@ -135,182 +124,30 @@ namespace ElectricalToolSuite.MECoordination
             return treeView.SelectMany(tv => tv.SelectedWithChildren).Select(item => item.ElementId);
         }
 
-        private IEnumerable<FamilySymbolItem> GetSelectedFamilySymbols(IEnumerable<TreeViewItemWithCheckbox> treeView)
+        private List<FamilySymbol> GetSelectedFamilySymbols(IEnumerable<TreeViewItemWithCheckbox> treeView)
         {
-            return treeView.SelectMany(tv => tv.SelectedWithChildren).OfType<FamilySymbolItem>();
+            return treeView.SelectMany(tv => tv.SelectedWithChildren)
+                .OfType<FamilySymbolItem>()
+                .Select(fsi => fsi.FamilySymbol)
+                .ToList();
         }
 
-        private void Synchronize(IEnumerable<FamilySymbolItem> mechanicalItems,
-            IEnumerable<FamilySymbolItem> electricalItems, Workset workset)
+        private bool ConfirmOperation(ICollection<ElementId> mechanicalInstances, ICollection<FamilySymbol> electricalSymbols)
         {
-            var mechanicalInstanceIds = GetAllInstances(mechanicalItems).ToList();
-            var electricalSymbols = electricalItems.Select(fsi => fsi.FamilySymbol).ToList();
-            int newItemCount = mechanicalInstanceIds.Count()*electricalSymbols.Count;
-
-            if (newItemCount == 0)
+            if (!mechanicalInstances.Any())
             {
                 TaskDialog.Show("No instances found", "No instances of the selected families were found.");
-            }
-            else
-            {
-                var message = String.Format("This operation will create {0} new {1}. Proceed?", newItemCount,
-                    newItemCount > 1 ? "instances" : "instance");
-
-                const TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-
-                var confirmationResult = TaskDialog.Show("Confirm operation", message, buttons);
-
-                if (confirmationResult == TaskDialogResult.Yes)
-                {
-                    CreateInstances(mechanicalInstanceIds, electricalSymbols, workset);
-                }
-            }
-        }
-
-        private void CreateInstances(IEnumerable<ElementId> mechanicalInstanceIds,
-            IEnumerable<FamilySymbol> electricalSymbols, Workset workset)
-        {
-            var targetInformation =
-                (from mechanicalElement in mechanicalInstanceIds
-                 let mechanicalInstance = (FamilyInstance) _document.GetElement(mechanicalElement)
-                 select new
-                 {
-                     ((LocationPoint) mechanicalInstance.Location).Point,
-                     mechanicalInstance.Host,
-                     Parameters = mechanicalInstance.GetOrderedParameters()
-                 }).ToList();
-
-            var newInstanceLocations = new List<Tuple<FamilyInstance, XYZ>>();
-            foreach (var electricalSymbol in electricalSymbols)
-            {
-                foreach (var targetInfo in targetInformation)
-                {
-                    FamilyInstance newInstance;
-
-                    if (targetInfo.Host != null)
-                        newInstance = _document.Create.NewFamilyInstance(targetInfo.Point, electricalSymbol,
-                            targetInfo.Host,
-                            StructuralType.NonStructural);
-                    else
-                        newInstance = _document.Create.NewFamilyInstance(targetInfo.Point, electricalSymbol,
-                            StructuralType.NonStructural);
-
-                    CopyMatchingParameters(targetInfo.Parameters, newInstance);
-
-                    SetElementWorkset(workset, newInstance);
-
-                    newInstanceLocations.Add(Tuple.Create(newInstance, targetInfo.Point));
-                }
-            }
-        }
-
-        private static void SetElementWorkset(Workset workset, FamilyInstance newInstance)
-        {
-            var worksetParameter = newInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
-            worksetParameter.Set(workset.Id.IntegerValue);
-        }
-
-        private static void CopyMatchingParameters(IList<Parameter> targetParameters, FamilyInstance newInstance)
-        {
-            foreach (Parameter targetParameter in targetParameters)
-            {
-                Parameter newInstanceParameter = newInstance.LookupParameter(targetParameter.Definition.Name);
-                if (newInstanceParameter != null && !newInstanceParameter.IsReadOnly)
-                {
-                    CopyParameterValue(targetParameter, newInstanceParameter);
-                }
-            }
-        }
-
-        private static void CopyParameterValue(Parameter targetParameter, Parameter newInstanceParameter)
-        {
-            switch (targetParameter.StorageType)
-            {
-                case StorageType.Double:
-                    newInstanceParameter.Set(targetParameter.AsDouble());
-                    break;
-                case StorageType.ElementId:
-                    newInstanceParameter.Set(targetParameter.AsElementId());
-                    break;
-                case StorageType.Integer:
-                    newInstanceParameter.Set(targetParameter.AsInteger());
-                    break;
-                case StorageType.String:
-                    newInstanceParameter.Set(targetParameter.AsString());
-                    break;
-                default:
-                    return;
-            }
-        }
-
-        private void CreateTags(IEnumerable<Tuple<FamilyInstance, XYZ>> instanceLocations, View view)
-        {
-            string failureMessage = "";
-            bool addLeader = _defaultSettings.UseTagLeaders;
-
-            foreach (var tuple in instanceLocations)
-            {
-                FamilyInstance instance = tuple.Item1;
-                XYZ location = tuple.Item2;
-
-                try
-                {
-                    _document.Create.NewTag(view, instance, addLeader, TagMode.TM_ADDBY_CATEGORY,
-                        TagOrientation.Horizontal, location);
-                }
-                catch (RevitExceptions.InvalidOperationException)
-                {
-                    failureMessage = String.Format("There is no tag available for family type \"{0} - {1}\"",
-                        instance.Symbol.Family.Name, instance.Symbol.Name);
-                }
+                return false;
             }
 
-            if (!String.IsNullOrEmpty(failureMessage))
-            {
-                TaskDialog.Show("Failed to create tags",
-                    String.Format("One or more tags could not be created. \nError message: \n{0}", failureMessage));
-            }
-        }
+            var newItemCount = mechanicalInstances.Count() * electricalSymbols.Count();
 
-        private IEnumerable<ElementId> GetAllInstances(IEnumerable<FamilySymbolItem> symbols)
-        {
-            var filters =
-                symbols.Select(fsi => new FamilyInstanceFilter(_document, fsi.FamilySymbol.Id))
-                    .Cast<ElementFilter>()
-                    .ToList();
-            var unionFilter = new LogicalOrFilter(filters);
-            return new FilteredElementCollector(_document).WherePasses(unionFilter).ToElementIds();
-        }
+            var message = String.Format("This operation will create {0} new {1}. Proceed?", newItemCount,
+                newItemCount > 1 ? "instances" : "instance");
 
-        private List<TreeViewItemWithCheckbox> GetTreeView(
-            Dictionary<Category, Dictionary<ElementId, HashSet<ElementId>>> categories)
-        {
-            var categoryTreeViewItems = new List<TreeViewItemWithCheckbox>();
+            const TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
 
-            foreach (Category category in categories.Keys.OrderBy(c => c.Name))
-            {
-                var categoryItem =
-                    new TreeViewItemWithCheckbox(category.Name, category.Id);
-                foreach (ElementId family in categories[category].Keys.OrderBy(GetElementName))
-                {
-                    var familyItem = new TreeViewItemWithCheckbox(_document.GetElement(family).Name, family);
-                    foreach (ElementId familySymbol in categories[category][family].OrderBy(GetElementName))
-                    {
-                        var familySymbolItem = new FamilySymbolItem(_document.GetElement(familySymbol).Name,
-                            (FamilySymbol) _document.GetElement(familySymbol));
-                        familyItem.AddChild(familySymbolItem);
-                    }
-                    categoryItem.AddChild(familyItem);
-                }
-                categoryTreeViewItems.Add(categoryItem);
-            }
-
-            return categoryTreeViewItems;
-        }
-
-        private string GetElementName(ElementId id)
-        {
-            return _document.GetElement(id).Name;
+            return TaskDialog.Show("Confirm operation", message, buttons) == TaskDialogResult.Yes;
         }
     }
 }
