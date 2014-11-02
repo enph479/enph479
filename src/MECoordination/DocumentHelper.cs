@@ -5,11 +5,11 @@ using Autodesk.Revit.DB.Structure;
 
 namespace ElectricalToolSuite.MECoordination
 {
-    public class DocumentAccess
+    public class DocumentHelper
     {
         public Document Document { get; private set; }
 
-        public DocumentAccess(Document document)
+        public DocumentHelper(Document document)
         {
             Document = document;
         }

@@ -8,7 +8,7 @@ namespace ElectricalToolSuite.MECoordination
         public ILookup<Category, Family> FamilyLookup { get; private set; }
         public ILookup<Family, FamilySymbol> SymbolLookup { get; private set; }
 
-        public IndexedElementLookup(DocumentAccess document)
+        public IndexedElementLookup(DocumentHelper document)
         {
             var symbols = document.FamilySymbols.ToList();
 

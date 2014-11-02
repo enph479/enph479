@@ -5,10 +5,10 @@ namespace ElectricalToolSuite.MECoordination
 {
     class MechanicalElectricalEquipmentCoordinator
     {
-        private readonly DocumentAccess _document;
+        private readonly DocumentHelper _document;
         private readonly Workset _electricalWorkset;
 
-        public MechanicalElectricalEquipmentCoordinator(DocumentAccess document, Workset electricalWorkset)
+        public MechanicalElectricalEquipmentCoordinator(DocumentHelper document, Workset electricalWorkset)
         {
             _document = document;
             _electricalWorkset = electricalWorkset;

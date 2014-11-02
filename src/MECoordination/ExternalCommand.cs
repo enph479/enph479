@@ -14,7 +14,7 @@ namespace ElectricalToolSuite.MECoordination
     public class ExternalCommand : IExternalCommand
     {
         private readonly Settings _defaultSettings;
-        private DocumentAccess _document;
+        private DocumentHelper _document;
 
         public ExternalCommand()
         {
@@ -23,7 +23,7 @@ namespace ElectricalToolSuite.MECoordination
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            _document = new DocumentAccess(commandData.Application.ActiveUIDocument.Document);
+            _document = new DocumentHelper(commandData.Application.ActiveUIDocument.Document);
 
             var mechanicalTree = GetTreeView(_defaultSettings.MechanicalCategories);
             var electricalTree = GetTreeView(_defaultSettings.ElectricalCategories);

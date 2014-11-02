@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CategoryIdEqualityComparer.cs" />
-    <Compile Include="DocumentAccess.cs" />
+    <Compile Include="DocumentHelper.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="FamilyIdEqualityComparer.cs" />
     <Compile Include="IndexedElementLookup.cs" />
