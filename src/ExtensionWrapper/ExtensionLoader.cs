@@ -25,10 +25,13 @@ namespace ElectricalToolSuite.ExtensionLoader
                 var commandType = LoadCommandType(assembly, targetCommand);
 
                 var command = assembly.CreateInstance(targetCommand);
-                var args = new object[] {commandData, message, elements};
+                var args = new object[] { commandData, message, elements };
                 const BindingFlags flags = BindingFlags.Default | BindingFlags.InvokeMethod;
-                
-                return (Result) commandType.InvokeMember("Execute", flags, null, command, args);
+
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.AssemblyResolve += LoadFromSameFolder;
+
+                return (Result)commandType.InvokeMember("Execute", flags, null, command, args);
             }
             catch (TargetInvocationException e)
             {
@@ -69,6 +72,17 @@ namespace ElectricalToolSuite.ExtensionLoader
                     return value;
             }
             throw new SettingsPropertyNotFoundException(key);
+        }
+
+        Assembly LoadFromSameFolder(object sender, ResolveEventArgs args)
+        {
+            var folderPath = Path.GetDirectoryName(GetType().Assembly.Location);
+            var assemblyPath = Path.Combine(folderPath, new AssemblyName(args.Name).Name + ".dll");
+            if (File.Exists(assemblyPath) == false) 
+                return null;
+            var bytes = File.ReadAllBytes(assemblyPath);
+            var assembly = Assembly.Load(bytes);
+            return assembly;
         }
     }
 }
