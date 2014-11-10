@@ -44,8 +44,6 @@ namespace Redbolts.DockableUITest.Commands
                 _button.LargeImage = ImageUtil.GetEmbeddedImage(Assembly, "Redbolts.DockableUITest.Images.HideDock.png");
             }
             _state = !_state;
-            Globals.Counter++;
-            Globals.CounterString = Globals.Counter.ToString();
 
             return Result.Succeeded;
         }

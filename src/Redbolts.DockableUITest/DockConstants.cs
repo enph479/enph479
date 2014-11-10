@@ -1,5 +1,4 @@
 ﻿using System;
-using Redbolts.UI.Common;
 
 namespace Redbolts.DockableUITest
 {

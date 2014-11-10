@@ -78,6 +78,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Redbolts.DockableUITest\Redbolts.DockableUITest.csproj">
+      <Project>{4ECE753F-74CC-4ED0-8FD1-93F2711A62D6}</Project>
+      <Name>Redbolts.DockableUITest</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

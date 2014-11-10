@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
+using Redbolts.DockableUITest;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
@@ -12,7 +10,7 @@ namespace ElectricalToolSuite.FindAndReplace
     /// </summary>
     public partial class FindResultsWindow
     {
-        public static SelElementSet SelectedElements;
+        public Element SelectedElement { get; set; }
         public FindResultsWindow()
         {
             InitializeComponent();
@@ -27,9 +25,7 @@ namespace ElectricalToolSuite.FindAndReplace
         private void GetSelectedElementFromResults(object sender, RoutedEventArgs e)
         {
             var castedSender = ((ListBox) sender);
-            var t = ((Element) castedSender.SelectedItem);
-            SelectedElements.Clear();
-            SelectedElements.Insert(t);
+            //Globals.SelectedElement = ((Element)castedSender.SelectedItem).Id;
             Close();
         } 
     }

@@ -22,9 +22,8 @@ namespace Redbolts.DockableUITest.UI
             get { return _counter; }
             set
             {
-                if (value == _counter) return;
-                OnPropertyChanged("Counter");
                 _counter = value;
+                OnPropertyChanged("Counter");
             }
         }
         private string _counter;
@@ -37,8 +36,6 @@ namespace Redbolts.DockableUITest.UI
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            Counter = Globals.CounterString;
-            Debug.WriteLine(Globals.CounterString);
         }
     }
 }

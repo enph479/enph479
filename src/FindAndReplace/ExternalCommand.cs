@@ -26,19 +26,14 @@ namespace ElectricalToolSuite.FindAndReplace
             var allElements = collector.OfClass(typeof (FamilyInstance));
             var matchingElements = textFinder.FindMatchingElements(allElements);
 
-            FindResultsWindow.SelectedElements = uiDocument.Selection.Elements;
             var resultsForm = new FindResultsWindow();
-            Globals.MatchingElements = matchingElements;
             resultsForm.UpdateElements(matchingElements);
-            //uiDocument.Selection.Elements = resultsForm.SelectedElements;
+            resultsForm.Show(); //must be show dialog, can't call revit api from outside of this loop
+
+            //uiDocument.Selection.Elements.Clear();
+            //uiDocument.Selection.Elements.Add(resultsForm.SelectedElement);
 
             return Result.Succeeded;
         }
-    }
-
-    public class Globals
-    {
-        public static FindResultsWindow FindResultsWindow;
-        public static ElementSet MatchingElements;
     }
 }
