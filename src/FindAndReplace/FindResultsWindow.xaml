@@ -6,10 +6,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ListView HorizontalAlignment="Left" Height="236" Margin="0,54,0,0" VerticalAlignment="Top" Width="290" x:Name="ListOfMatchingElements">
+        <ListView HorizontalAlignment="Left" Height="auto" Margin="0,54,0,0" VerticalAlignment="Top" Width="auto" x:Name="ListOfMatchingElements">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" DisplayMemberBinding ="{Binding Path=Name}"/>
+                    <GridViewColumn Header="Family Name" DisplayMemberBinding ="{Binding Path=Symbol.Family.Name}"/>
+                    <GridViewColumn Header="Family Type" DisplayMemberBinding ="{Binding Path=Symbol.Name}"/>         
                 </GridView>
             </ListView.View>
         </ListView>

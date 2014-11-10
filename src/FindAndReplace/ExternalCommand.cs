@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -13,7 +15,7 @@ namespace ElectricalToolSuite.FindAndReplace
         {
             var findForm = new FindAndReplaceWindow();
             findForm.ShowDialog();
-            var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings());            
+            var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings());
 
             var uiDocument = commandData.Application.ActiveUIDocument;
             var document = uiDocument.Document;
@@ -21,19 +23,22 @@ namespace ElectricalToolSuite.FindAndReplace
             var collector = new FilteredElementCollector(document);
 
             //currently getting ALL elements is really slow.
-            var allElements = collector.WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false),
-                new ElementIsElementTypeFilter(true)));
-
+            var allElements = collector.OfClass(typeof (FamilyInstance));
             var matchingElements = textFinder.FindMatchingElements(allElements);
 
+            FindResultsWindow.SelectedElements = uiDocument.Selection.Elements;
             var resultsForm = new FindResultsWindow();
-            resultsForm.SelectedElements = uiDocument.Selection.Elements;
+            Globals.MatchingElements = matchingElements;
             resultsForm.UpdateElements(matchingElements);
-            resultsForm.ShowDialog();
-
-            uiDocument.Selection.Elements = resultsForm.SelectedElements;
+            //uiDocument.Selection.Elements = resultsForm.SelectedElements;
 
             return Result.Succeeded;
         }
+    }
+
+    public class Globals
+    {
+        public static FindResultsWindow FindResultsWindow;
+        public static ElementSet MatchingElements;
     }
 }

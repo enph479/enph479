@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Autodesk.Revit.DB;
 
 namespace ElectricalToolSuite.FindAndReplace
@@ -14,7 +15,7 @@ namespace ElectricalToolSuite.FindAndReplace
         public ElementSet FindMatchingElements(FilteredElementCollector allElements)
         {
             var matchingElements = new ElementSet();
-            foreach (Element elem in allElements)
+            foreach (FamilyInstance elem in allElements.Cast<FamilyInstance>())
             {
                 foreach (Parameter param in elem.Parameters)
                 {

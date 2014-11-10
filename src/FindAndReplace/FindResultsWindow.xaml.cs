@@ -12,7 +12,7 @@ namespace ElectricalToolSuite.FindAndReplace
     /// </summary>
     public partial class FindResultsWindow
     {
-        public SelElementSet SelectedElements { get; set; }
+        public static SelElementSet SelectedElements;
         public FindResultsWindow()
         {
             InitializeComponent();
