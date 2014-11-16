@@ -1,6 +1,6 @@
 ﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    public enum VerticalAlignment
+    internal enum VerticalAlignment
     {
         Unknown,
         Top,

@@ -1,6 +1,8 @@
-﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
+﻿using System.Drawing;
+
+namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    public class BorderLineStyle
+    internal class BorderLineStyle
     {
         public Color Color { get; set; }
         public int Weight { get; set; }

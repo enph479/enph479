@@ -38,10 +38,8 @@
       <HintPath>..\packages\NetOffice.Core.1.6.0.0\lib\net45\NetOffice.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="OfficeApi">
-      <HintPath>..\packages\NetOffice.Core.1.6.0.0\lib\net45\OfficeApi.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\RevitAPI.dll</HintPath>
@@ -53,21 +51,14 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="VBIDEApi">
-      <HintPath>..\packages\NetOffice.Core.1.6.0.0\lib\net45\VBIDEApi.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CellFormatting\BorderLineStyle.cs" />
     <Compile Include="CellFormatting\Cell.cs" />
-    <Compile Include="CellFormatting\Color.cs" />
     <Compile Include="CellFormatting\HorizontalAlignment.cs" />
+    <Compile Include="CellFormatting\Orientation.cs" />
     <Compile Include="CellFormatting\VerticalAlignment.cs" />
     <Compile Include="ColorExtensions.cs" />
     <Compile Include="ExternalCommand.cs" />

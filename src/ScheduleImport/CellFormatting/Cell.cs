@@ -1,6 +1,8 @@
-﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
+﻿using System.Drawing;
+
+namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    public class Cell
+    internal class Cell
     {
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
@@ -26,5 +28,7 @@
         public BorderLineStyle TopBorderLineStyle { get; set; }
         public BorderLineStyle LeftBorderLineStyle { get; set; }
         public BorderLineStyle RightBorderLineStyle { get; set; }
+
+        public Orientation Orientation { get; set; }
     }
 }

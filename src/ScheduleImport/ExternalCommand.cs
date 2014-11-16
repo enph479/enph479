@@ -1,8 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
@@ -11,6 +10,8 @@ using System;
 using NetOffice.ExcelApi.Enums;
 using Excel = NetOffice.ExcelApi;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
+using Color = Autodesk.Revit.DB.Color;
+using Orientation = ElectricalToolSuite.ScheduleImport.CellFormatting.Orientation;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
@@ -33,14 +34,19 @@ namespace ElectricalToolSuite.ScheduleImport
 
             var tbl = sch.GetTableData();
             
+            tbl.GetSectionData(SectionType.Header).HideSection = true;
+            tbl.GetSectionData(SectionType.Footer).HideSection = true;
+            tbl.GetSectionData(SectionType.Summary).HideSection = true;
             var secData = tbl.GetSectionData(SectionType.Body);
+
+            if (secData.NeedsRefresh)
+                secData.RefreshData();
 
             Debug.WriteLine(sch.ViewName);
             Debug.WriteLine(sch.Name);
 
             // start excel and turn off msg boxes
-            Excel.Application excelApplication = new Excel.Application();
-            excelApplication.DisplayAlerts = false;
+            var excelApplication = new Excel.Application {DisplayAlerts = false};
 
             try
             {
@@ -55,28 +61,49 @@ namespace ElectricalToolSuite.ScheduleImport
 
                 Debug.Assert(ws != null);
 
-                var cells = CreateCells(ws.UsedRange);
-
-                Debug.Assert(cells.Any());
-
+                var usedRange = ws.UsedRange;
+                
                 // TODO Fix off-by-one errors
-                int rowCount = cells.Select(c => c.RowIndex + c.NumberOfRows).Max() + 1;
-                int colCount = cells.Select(c => c.ColumnIndex + c.NumberOfColumns).Max() + 1;
+                int rowCount = usedRange.Rows.Count;
+                int colCount = usedRange.Columns.Count;
 
-                while (secData.NumberOfRows < rowCount)
+                var colWidths = new List<double>();
+                var rowHeights = new List<double>();
+
+                for (int i = 1; i <= rowCount; ++i)
+                {
+                    rowHeights.Add((double)usedRange[i, 1].RowHeight);
+                }
+                for (int j = 1; j <= colCount; ++j)
+                {
+                    colWidths.Add((double)usedRange[1, j].ColumnWidth);
+                }
+
+                while (secData.NumberOfRows < rowCount + 1)
                     secData.InsertRow(secData.LastRowNumber);
 
-                while (secData.NumberOfRows > rowCount)
+                while (secData.NumberOfRows > rowCount + 1)
                     secData.RemoveRow(secData.LastRowNumber);
 
-                while (secData.NumberOfColumns < colCount)
+                while (secData.NumberOfColumns < colCount + 1)
                     secData.InsertColumn(secData.LastColumnNumber);
 
-                while (secData.NumberOfColumns > colCount)
+                while (secData.NumberOfColumns > colCount + 1)
                     secData.RemoveColumn(secData.LastColumnNumber);
 
-//                Debug.Assert(secData.LastColumnNumber - secData.FirstColumnNumber + 1 == colCount);
-//                Debug.Assert(secData.LastRowNumber - secData.FirstRowNumber + 1 == rowCount);
+                for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
+                    secData.SetColumnWidthInPixels(colIndex + secData.FirstColumnNumber, (int)(colWidths[colIndex] * 4.0 / 4.0));
+
+                for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
+                    secData.SetRowHeightInPixels(rowIndex + secData.FirstRowNumber, (int)(rowHeights[rowIndex] * 4.0 / 3.0));
+
+                for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
+                    for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
+                        secData.ClearCell(rowIndex + secData.FirstRowNumber, colIndex + secData.FirstColumnNumber);
+                
+                var cells = CreateCells(usedRange);
+
+                Debug.Assert(cells.Any());
 
                 var overrideOptions = new TableCellStyleOverrideOptions
                 {
@@ -86,7 +113,10 @@ namespace ElectricalToolSuite.ScheduleImport
                     VerticalAlignment = true,
                     Bold = true,
                     Italics = true,
-                    Underline = true
+                    Underline = true,
+                    BackgroundColor = true,
+                    FontColor = true,
+                    TextOrientation = true
                 };
 
                 for (int col = secData.FirstColumnNumber; col <= secData.LastColumnNumber; ++col)
@@ -94,16 +124,17 @@ namespace ElectricalToolSuite.ScheduleImport
 
                 foreach (var cell in cells)
                 {
-                    if (cell.NumberOfColumns > 1 || cell.NumberOfRows > 1)
-                    {
-                        var mergedCell = new TableMergedCell(
-                            cell.RowIndex + secData.FirstRowNumber,
-                            cell.ColumnIndex + secData.FirstColumnNumber,
-                            cell.RowIndex + secData.FirstRowNumber + cell.NumberOfRows - 1,
-                            cell.ColumnIndex + secData.FirstColumnNumber + cell.NumberOfColumns - 1);
-                        secData.MergeCells(mergedCell);
-                    }
+                    var mergedCell = new TableMergedCell(
+                        cell.RowIndex + secData.FirstRowNumber,
+                        cell.ColumnIndex + secData.FirstColumnNumber,
+                        cell.RowIndex + secData.FirstRowNumber + cell.NumberOfRows - 1,
+                        cell.ColumnIndex + secData.FirstColumnNumber + cell.NumberOfColumns - 1);
 
+                    secData.MergeCells(mergedCell);
+                }
+                
+                foreach (var cell in cells.Where(cell => !String.IsNullOrWhiteSpace(cell.Text)))
+                {
                     secData.SetCellText(cell.RowIndex + secData.FirstRowNumber, 
                         cell.ColumnIndex + secData.FirstColumnNumber, 
                         cell.Text ?? "");
@@ -118,20 +149,14 @@ namespace ElectricalToolSuite.ScheduleImport
                     fmt.IsFontUnderline = cell.FontUnderline;
                     fmt.FontHorizontalAlignment = ConvertHorizontalAlignment(cell.HorizontalAlignment);
                     fmt.FontVerticalAlignment = ConvertVerticalAlignment(cell.VerticalAlignment);
-
+                    fmt.BackgroundColor = ConvertColor(cell.BackgroundColor);
+                    fmt.TextColor = ConvertColor(cell.FontColor);
+                    fmt.TextOrientation = ConvertOrientation(cell.Orientation);
+                    
                     secData.SetCellStyle(cell.RowIndex + secData.FirstRowNumber, 
                         cell.ColumnIndex + secData.FirstColumnNumber, 
                         fmt);
                 }
-
-                var colWidths = ws.UsedRange.Where(c => c.Row == 1).Select(c => (double) c.Width).ToList();
-                var rowHeights = ws.UsedRange.Where(c => c.Column == 1).Select(c => (double) c.Height).ToList();
-
-                for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
-                    secData.SetColumnWidthInPixels(colIndex + secData.FirstColumnNumber, (int)(colWidths[colIndex] * 4.0 / 3.0));
-
-                for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
-                    secData.SetRowHeightInPixels(rowIndex + secData.FirstRowNumber, (int)(rowHeights[rowIndex] * 4.0 / 3.0));
 
                 watch.Stop();
             }
@@ -147,6 +172,11 @@ namespace ElectricalToolSuite.ScheduleImport
             TaskDialog.Show("Elapsed", elapsed.ToString());
             
             return Result.Succeeded;
+        }
+
+        private Color ConvertColor(System.Drawing.Color color)
+        {
+            return new Color(color.R, color.G, color.B);
         }
 
         private HorizontalAlignment ConvertHorizontalAlignment(XlHAlign alignment)
@@ -243,38 +273,70 @@ namespace ElectricalToolSuite.ScheduleImport
                 {
                     var cell = range[i, j];
                     if (!((bool) cell.MergeCells && !cell.MergeArea.Address.StartsWith(cell.Address)))
-                        cells.Add(CreateCell(cell));
+                        cells.Add(CreateCell(cell, i, j));
                 }
             }
 
             return cells;
         }
 
-        private Cell CreateCell(Excel.Range r)
+        private Orientation ConvertOrientation(XlOrientation excelOrientation)
         {
-            var font = r.Font;
+            switch (excelOrientation)
+            {
+                case XlOrientation.xlDownward:
+                    return Orientation.Downward;
+                case XlOrientation.xlHorizontal:
+                    return Orientation.Horizontal;
+                case XlOrientation.xlUpward:
+                    return Orientation.Upward;
+                case XlOrientation.xlVertical:
+                    return Orientation.Vertical;
+                default:
+                    return Orientation.Unknown;
+            }
+        }
+
+        private int ConvertOrientation(Orientation orientation)
+        {
+            switch (orientation)
+            {
+                case Orientation.Vertical:
+                case Orientation.Upward:
+                    return 900;
+                case Orientation.Downward:
+                    return -900;
+                default:
+                    return 0;
+            }
+        }
+
+        private Cell CreateCell(Excel.Range interopCell, int rowIndex, int columnIndex)
+        {
+            var font = interopCell.Font;
+
             var cell = new Cell
             {
-                RowIndex = r.Row-1,
-                ColumnIndex = r.Column-1,
-                Text = (r.Text ?? r.Value2 ?? r.Value ?? "").ToString(),
+                RowIndex = rowIndex - 1,
+                ColumnIndex = columnIndex - 1,
+                Text = (interopCell.Text ?? interopCell.Value2 ?? "").ToString(),
                 FontName = (string) font.Name,
                 FontSize = (double) font.Size,
                 FontBold = (bool) font.Bold,
                 FontItalic = (bool) font.Italic,
                 FontUnderline = ConvertUnderline((XlUnderlineStyle) font.Underline),
-                // TODO text colour
-                // TODO background colour
+                BackgroundColor = ColorTranslator.FromOle(Convert.ToInt32((double) interopCell.Interior.Color)),
+                FontColor = ColorTranslator.FromOle(Convert.ToInt32((double) font.Color)),
                 // TODO background shading (?)
-                HorizontalAlignment = ConvertHorizontalAlignment((XlHAlign) r.HorizontalAlignment),
-                VerticalAlignment = ConvertVerticalAlignment((XlVAlign) r.VerticalAlignment),
+                HorizontalAlignment = ConvertHorizontalAlignment((XlHAlign) interopCell.HorizontalAlignment),
+                VerticalAlignment = ConvertVerticalAlignment((XlVAlign) interopCell.VerticalAlignment),
                 // TODO border lines
-                // TODO orientation
+                Orientation = ConvertOrientation((XlOrientation) interopCell.Orientation)
             };
 
-            if ((bool) r.MergeCells)
+            if ((bool) interopCell.MergeCells)
             {
-                var mergeArea = r.MergeArea;
+                var mergeArea = interopCell.MergeArea;
                 cell.NumberOfColumns = mergeArea.Columns.Count;
                 cell.NumberOfRows = mergeArea.Rows.Count;
             }
