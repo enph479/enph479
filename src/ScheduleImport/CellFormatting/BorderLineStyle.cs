@@ -1,10 +1,9 @@
-﻿using System.Drawing;
-
-namespace ElectricalToolSuite.ScheduleImport.CellFormatting
+﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    internal class BorderLineStyle
+    internal enum BorderLineStyle
     {
-        public Color Color { get; set; }
-        public int Weight { get; set; }
+        Unknown,
+        NoBorder,
+        Border
     }
 }

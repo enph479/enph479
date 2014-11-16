@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
@@ -24,6 +26,11 @@ namespace ElectricalToolSuite.ScheduleImport
 
             var doc = commandData.Application.ActiveUIDocument.Document;
 
+//            var gfxStyles =
+//                new FilteredElementCollector(doc).OfClass(typeof (GraphicsStyle)).Cast<GraphicsStyle>().ToList();
+
+//            return Result.Succeeded;
+
             var sch =
                 new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
                     .Cast<PanelScheduleView>()
@@ -42,11 +49,65 @@ namespace ElectricalToolSuite.ScheduleImport
             if (secData.NeedsRefresh)
                 secData.RefreshData();
 
+//            var lineStyleIds = new HashSet<ElementId>();
+
+//            for (int i = secData.FirstRowNumber; i <= secData.LastRowNumber; ++i)
+//                for (int j = secData.FirstColumnNumber; j <= secData.LastColumnNumber; ++j)
+//                {
+//                    try
+//                    {
+//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderTopLineStyle);
+//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderBottomLineStyle);
+//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderLeftLineStyle);
+//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderRightLineStyle);
+//                    }
+//                    catch (Exception)
+//                    {
+//                    }
+//                }
+
+//            var sb = new StringBuilder();
+//            foreach (var id in lineStyleIds)
+//            {
+//                var elem = doc.GetElement(id);
+//                var name = "";
+//                if (elem != null) name = elem.Name;
+//                sb.AppendLine(String.Format("{0} - {1}",  name, id.IntegerValue.ToString()));
+//            }
+
+//            File.WriteAllText(@"C:\users\blake\desktop\linestyleids.txt", sb.ToString());
+
+//            return Result.Succeeded;
+
             Debug.WriteLine(sch.ViewName);
             Debug.WriteLine(sch.Name);
 
             // start excel and turn off msg boxes
             var excelApplication = new Excel.Application {DisplayAlerts = false};
+
+//            var linesCategory = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Lines);
+//            var lineStyleCategories = linesCategory.SubCategories;
+
+            var graphicsStyles = new FilteredElementCollector(doc).OfClass(typeof(GraphicsStyle))
+                    .Cast<GraphicsStyle>().ToList();
+
+            var visibleLineStyleId = new ElementId(-2000042);
+//                graphicsStyles.First(gfx => gfx.Name == "Schedule Default").Id;
+
+
+            var hiddenLineStyleId =
+                graphicsStyles.First(gfx => gfx.Name == "<Invisible lines>").Id;
+
+//            var sb = new StringBuilder();
+
+//            foreach (var cat in cats)
+//            {
+//                sb.AppendLine(String.Format("{0}: {1}, {2}", cat.Name, (cat.GraphicsStyleCategory ?? cat.Category).Name, cat.GraphicsStyleType));
+//            }
+
+//            File.WriteAllText(@"C:\users\blake\desktop\gfxstyles.txt", sb.ToString());
+
+//            return Result.Cancelled;
 
             try
             {
@@ -116,7 +177,12 @@ namespace ElectricalToolSuite.ScheduleImport
                     Underline = true,
                     BackgroundColor = true,
                     FontColor = true,
-                    TextOrientation = true
+                    TextOrientation = true,
+                    BorderBottomLineStyle = true,
+                    BorderTopLineStyle = true,
+                    BorderLeftLineStyle = true,
+                    BorderRightLineStyle = true,
+                    BorderLineStyle = true
                 };
 
                 for (int col = secData.FirstColumnNumber; col <= secData.LastColumnNumber; ++col)
@@ -133,13 +199,14 @@ namespace ElectricalToolSuite.ScheduleImport
                     secData.MergeCells(mergedCell);
                 }
                 
-                foreach (var cell in cells.Where(cell => !String.IsNullOrWhiteSpace(cell.Text)))
+                foreach (var cell in cells)
                 {
                     secData.SetCellText(cell.RowIndex + secData.FirstRowNumber, 
                         cell.ColumnIndex + secData.FirstColumnNumber, 
                         cell.Text ?? "");
 
                     var fmt = new TableCellStyle();
+                    fmt.ResetOverride();
                     fmt.SetCellStyleOverrideOptions(overrideOptions);
 
                     fmt.FontName = cell.FontName;
@@ -152,7 +219,24 @@ namespace ElectricalToolSuite.ScheduleImport
                     fmt.BackgroundColor = ConvertColor(cell.BackgroundColor);
                     fmt.TextColor = ConvertColor(cell.FontColor);
                     fmt.TextOrientation = ConvertOrientation(cell.Orientation);
+
+                    fmt.BorderBottomLineStyle = cell.BottomBorderLine == BorderLineStyle.Border
+                        ? visibleLineStyleId
+                        : ElementId.InvalidElementId;
+
+                    fmt.BorderTopLineStyle = cell.TopBorderLine == BorderLineStyle.Border
+                        ? visibleLineStyleId
+                        : ElementId.InvalidElementId;
                     
+                    fmt.BorderLeftLineStyle = cell.LeftBorderLine == BorderLineStyle.Border
+                        ? visibleLineStyleId
+                        : ElementId.InvalidElementId;
+                    
+                    fmt.BorderRightLineStyle = cell.RightBorderLine == BorderLineStyle.Border
+                        ? visibleLineStyleId
+                        : ElementId.InvalidElementId;
+
+
                     secData.SetCellStyle(cell.RowIndex + secData.FirstRowNumber, 
                         cell.ColumnIndex + secData.FirstColumnNumber, 
                         fmt);
@@ -274,6 +358,8 @@ namespace ElectricalToolSuite.ScheduleImport
                     var cell = range[i, j];
                     if (!((bool) cell.MergeCells && !cell.MergeArea.Address.StartsWith(cell.Address)))
                         cells.Add(CreateCell(cell, i, j));
+
+                    Debug.Print("{0}, {1}", i, j);
                 }
             }
 
@@ -311,9 +397,23 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
+        private BorderLineStyle ConvertBorder(Excel.Border border)
+        {
+            var style = (XlLineStyle) border.LineStyle;
+
+            switch (style)
+            {
+                case XlLineStyle.xlLineStyleNone:
+                    return BorderLineStyle.NoBorder;
+                default:
+                    return BorderLineStyle.Border;
+            }
+        }
+
         private Cell CreateCell(Excel.Range interopCell, int rowIndex, int columnIndex)
         {
             var font = interopCell.Font;
+            var borders = interopCell.Borders;
 
             var cell = new Cell
             {
@@ -331,7 +431,12 @@ namespace ElectricalToolSuite.ScheduleImport
                 HorizontalAlignment = ConvertHorizontalAlignment((XlHAlign) interopCell.HorizontalAlignment),
                 VerticalAlignment = ConvertVerticalAlignment((XlVAlign) interopCell.VerticalAlignment),
                 // TODO border lines
-                Orientation = ConvertOrientation((XlOrientation) interopCell.Orientation)
+                Orientation = ConvertOrientation((XlOrientation) interopCell.Orientation),
+
+                BottomBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeBottom]),
+                TopBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeTop]),
+                LeftBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeLeft]),
+                RightBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeRight])
             };
 
             if ((bool) interopCell.MergeCells)

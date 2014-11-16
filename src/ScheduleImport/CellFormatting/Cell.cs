@@ -24,10 +24,10 @@ namespace ElectricalToolSuite.ScheduleImport.CellFormatting
         public HorizontalAlignment HorizontalAlignment { get; set; }
         public VerticalAlignment VerticalAlignment { get; set; }
 
-        public BorderLineStyle BottomBorderLineStyle { get; set; }
-        public BorderLineStyle TopBorderLineStyle { get; set; }
-        public BorderLineStyle LeftBorderLineStyle { get; set; }
-        public BorderLineStyle RightBorderLineStyle { get; set; }
+        public BorderLineStyle BottomBorderLine { get; set; }
+        public BorderLineStyle TopBorderLine { get; set; }
+        public BorderLineStyle LeftBorderLine { get; set; }
+        public BorderLineStyle RightBorderLine { get; set; }
 
         public Orientation Orientation { get; set; }
     }
