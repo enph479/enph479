@@ -1,19 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.UI;
 using System;
-using NetOffice.ExcelApi.Enums;
-using Excel = NetOffice.ExcelApi;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
 using Color = Autodesk.Revit.DB.Color;
 using Orientation = ElectricalToolSuite.ScheduleImport.CellFormatting.Orientation;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
@@ -83,7 +80,7 @@ namespace ElectricalToolSuite.ScheduleImport
             Debug.WriteLine(sch.Name);
 
             // start excel and turn off msg boxes
-            var excelApplication = new Excel.Application {DisplayAlerts = false};
+            var excelApplication = new Microsoft.Office.Interop.Excel.Application {DisplayAlerts = false};
 
 //            var linesCategory = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Lines);
 //            var lineStyleCategories = linesCategory.SubCategories;
@@ -91,12 +88,12 @@ namespace ElectricalToolSuite.ScheduleImport
             var graphicsStyles = new FilteredElementCollector(doc).OfClass(typeof(GraphicsStyle))
                     .Cast<GraphicsStyle>().ToList();
 
-            var visibleLineStyleId = new ElementId(-2000042);
+            var visibleLineStyleId = 
+                new ElementId(BuiltInCategory.OST_CurvesThinLines);
+
 //                graphicsStyles.First(gfx => gfx.Name == "Schedule Default").Id;
-
-
-            var hiddenLineStyleId =
-                graphicsStyles.First(gfx => gfx.Name == "<Invisible lines>").Id;
+//            var hiddenLineStyleId =
+//                graphicsStyles.First(gfx => gfx.Name == "<Invisible lines>").Id;
 
 //            var sb = new StringBuilder();
 
@@ -114,7 +111,8 @@ namespace ElectricalToolSuite.ScheduleImport
                 watch.Start();
 
                 var wb = excelApplication.Workbooks.Open(
-                    @"C:\Users\Blake\Google Drive\ENPH 479 Revit Project\Electrical Panel Schedules\3690_Elec Panel Sch Working.xlsm");
+                    @"C:\Users\Blake\Google Drive\ENPH 479 Revit Project\Electrical Panel Schedules\3690_Elec Panel Sch Working.xlsm",
+                    ReadOnly: true);
 
                 Debug.Assert(wb != null);
 
@@ -235,8 +233,7 @@ namespace ElectricalToolSuite.ScheduleImport
                     fmt.BorderRightLineStyle = cell.RightBorderLine == BorderLineStyle.Border
                         ? visibleLineStyleId
                         : ElementId.InvalidElementId;
-
-
+                    
                     secData.SetCellStyle(cell.RowIndex + secData.FirstRowNumber, 
                         cell.ColumnIndex + secData.FirstColumnNumber, 
                         fmt);
@@ -248,7 +245,7 @@ namespace ElectricalToolSuite.ScheduleImport
             {
                 // close excel and dispose reference
                 excelApplication.Quit();
-                excelApplication.Dispose();
+//                excelApplication.Dispose();
             }
 
             var elapsed = watch.Elapsed;
@@ -263,51 +260,51 @@ namespace ElectricalToolSuite.ScheduleImport
             return new Color(color.R, color.G, color.B);
         }
 
-        private HorizontalAlignment ConvertHorizontalAlignment(XlHAlign alignment)
+        private HorizontalAlignment ConvertHorizontalAlignment(Excel.XlHAlign alignment)
         {
             switch (alignment)
             {
-                case XlHAlign.xlHAlignCenter:
-                case XlHAlign.xlHAlignCenterAcrossSelection:
-                case XlHAlign.xlHAlignDistributed:
-                case XlHAlign.xlHAlignFill:
-                case XlHAlign.xlHAlignJustify:
+                case Excel.XlHAlign.xlHAlignCenter:
+                case Excel.XlHAlign.xlHAlignCenterAcrossSelection:
+                case Excel.XlHAlign.xlHAlignDistributed:
+                case Excel.XlHAlign.xlHAlignFill:
+                case Excel.XlHAlign.xlHAlignJustify:
                     return HorizontalAlignment.Center;
-                case XlHAlign.xlHAlignLeft:
-                case XlHAlign.xlHAlignGeneral:
+                case Excel.XlHAlign.xlHAlignLeft:
+                case Excel.XlHAlign.xlHAlignGeneral:
                     return HorizontalAlignment.Left;
-                case XlHAlign.xlHAlignRight:
+                case Excel.XlHAlign.xlHAlignRight:
                     return HorizontalAlignment.Right;
                 default:
                     return HorizontalAlignment.Unknown;
             }
         }
 
-        private VerticalAlignment ConvertVerticalAlignment(XlVAlign alignment)
+        private VerticalAlignment ConvertVerticalAlignment(Excel.XlVAlign alignment)
         {
             switch (alignment)
             {
-                case XlVAlign.xlVAlignDistributed:
-                case XlVAlign.xlVAlignCenter:
-                case XlVAlign.xlVAlignJustify:
+                case Excel.XlVAlign.xlVAlignDistributed:
+                case Excel.XlVAlign.xlVAlignCenter:
+                case Excel.XlVAlign.xlVAlignJustify:
                     return VerticalAlignment.Center;
-                case XlVAlign.xlVAlignBottom:
+                case Excel.XlVAlign.xlVAlignBottom:
                     return VerticalAlignment.Bottom;
-                case XlVAlign.xlVAlignTop:
+                case Excel.XlVAlign.xlVAlignTop:
                     return VerticalAlignment.Top;
                 default:
                     return VerticalAlignment.Unknown;
             }
         }
 
-        private bool ConvertUnderline(XlUnderlineStyle underline)
+        private bool ConvertUnderline(Excel.XlUnderlineStyle underline)
         {
             switch (underline)
             {
-                case XlUnderlineStyle.xlUnderlineStyleSingle:
-                case XlUnderlineStyle.xlUnderlineStyleSingleAccounting:
-                case XlUnderlineStyle.xlUnderlineStyleDouble:
-                case XlUnderlineStyle.xlUnderlineStyleDoubleAccounting:
+                case Excel.XlUnderlineStyle.xlUnderlineStyleSingle:
+                case Excel.XlUnderlineStyle.xlUnderlineStyleSingleAccounting:
+                case Excel.XlUnderlineStyle.xlUnderlineStyleDouble:
+                case Excel.XlUnderlineStyle.xlUnderlineStyleDoubleAccounting:
                     return true;
                 default:
                     return false;
@@ -366,17 +363,17 @@ namespace ElectricalToolSuite.ScheduleImport
             return cells;
         }
 
-        private Orientation ConvertOrientation(XlOrientation excelOrientation)
+        private Orientation ConvertOrientation(Excel.XlOrientation excelOrientation)
         {
             switch (excelOrientation)
             {
-                case XlOrientation.xlDownward:
+                case Excel.XlOrientation.xlDownward:
                     return Orientation.Downward;
-                case XlOrientation.xlHorizontal:
+                case Excel.XlOrientation.xlHorizontal:
                     return Orientation.Horizontal;
-                case XlOrientation.xlUpward:
+                case Excel.XlOrientation.xlUpward:
                     return Orientation.Upward;
-                case XlOrientation.xlVertical:
+                case Excel.XlOrientation.xlVertical:
                     return Orientation.Vertical;
                 default:
                     return Orientation.Unknown;
@@ -399,11 +396,11 @@ namespace ElectricalToolSuite.ScheduleImport
 
         private BorderLineStyle ConvertBorder(Excel.Border border)
         {
-            var style = (XlLineStyle) border.LineStyle;
+            var style = (Excel.XlLineStyle) border.LineStyle;
 
             switch (style)
             {
-                case XlLineStyle.xlLineStyleNone:
+                case Excel.XlLineStyle.xlLineStyleNone:
                     return BorderLineStyle.NoBorder;
                 default:
                     return BorderLineStyle.Border;
@@ -414,6 +411,7 @@ namespace ElectricalToolSuite.ScheduleImport
         {
             var font = interopCell.Font;
             var borders = interopCell.Borders;
+            var interior = interopCell.Interior;
 
             var cell = new Cell
             {
@@ -424,20 +422,24 @@ namespace ElectricalToolSuite.ScheduleImport
                 FontSize = (double) font.Size,
                 FontBold = (bool) font.Bold,
                 FontItalic = (bool) font.Italic,
-                FontUnderline = ConvertUnderline((XlUnderlineStyle) font.Underline),
-                BackgroundColor = ColorTranslator.FromOle(Convert.ToInt32((double) interopCell.Interior.Color)),
+                FontUnderline = ConvertUnderline((Excel.XlUnderlineStyle) font.Underline),
+                BackgroundColor = ColorTranslator.FromOle(Convert.ToInt32((double) interior.Color)),
                 FontColor = ColorTranslator.FromOle(Convert.ToInt32((double) font.Color)),
-                // TODO background shading (?)
-                HorizontalAlignment = ConvertHorizontalAlignment((XlHAlign) interopCell.HorizontalAlignment),
-                VerticalAlignment = ConvertVerticalAlignment((XlVAlign) interopCell.VerticalAlignment),
-                // TODO border lines
-                Orientation = ConvertOrientation((XlOrientation) interopCell.Orientation),
+                HorizontalAlignment = ConvertHorizontalAlignment((Excel.XlHAlign) interopCell.HorizontalAlignment),
+                VerticalAlignment = ConvertVerticalAlignment((Excel.XlVAlign) interopCell.VerticalAlignment),
+                Orientation = ConvertOrientation((Excel.XlOrientation) interopCell.Orientation),
 
-                BottomBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeBottom]),
-                TopBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeTop]),
-                LeftBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeLeft]),
-                RightBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeRight])
+                BottomBorderLine = ConvertBorder(borders[Excel.XlBordersIndex.xlEdgeBottom]),
+                TopBorderLine = ConvertBorder(borders[Excel.XlBordersIndex.xlEdgeTop]),
+                LeftBorderLine = ConvertBorder(borders[Excel.XlBordersIndex.xlEdgeLeft]),
+                RightBorderLine = ConvertBorder(borders[Excel.XlBordersIndex.xlEdgeRight])
             };
+
+            if (cell.BackgroundColor == System.Drawing.Color.White &&
+                ((Excel.XlPattern) interior.Pattern) != Excel.XlPattern.xlPatternNone)
+            {
+                cell.BackgroundColor = System.Drawing.Color.LightGray;
+            }
 
             if ((bool) interopCell.MergeCells)
             {
