@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
-using Redbolts.DockableUITest;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
@@ -25,7 +24,7 @@ namespace ElectricalToolSuite.FindAndReplace
         private void GetSelectedElementFromResults(object sender, RoutedEventArgs e)
         {
             var castedSender = ((ListBox) sender);
-            //Globals.SelectedElement = ((Element)castedSender.SelectedItem).Id;
+            Globals.SelectedElement = ((Element)castedSender.SelectedItem).Id;
             Close();
         } 
     }

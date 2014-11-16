@@ -28,7 +28,7 @@ public static class DockExtensions
         return false;
     }
 
-    public static void RegisterDockablePane(this UIControlledApplication application,
+    public static void RegisterDockablePane2(this UIControlledApplication application,
         Guid id, string title,FrameworkElement dockElement, DockablePaneState state )
     {
         var dPid = new DockablePaneId(id);

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ElectricalToolSuite.FindAndReplace
+﻿namespace ElectricalToolSuite.FindAndReplace
 {
     public class FinderSettings
     {
