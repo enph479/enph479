@@ -19,6 +19,8 @@ namespace ElectricalToolSuite.ScheduleImport
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            var watch = new Stopwatch();
+
             var doc = commandData.Application.ActiveUIDocument.Document;
 
             var sch =
@@ -42,6 +44,8 @@ namespace ElectricalToolSuite.ScheduleImport
 
             try
             {
+                watch.Start();
+
                 var wb = excelApplication.Workbooks.Open(
                     @"C:\Users\Blake\Google Drive\ENPH 479 Revit Project\Electrical Panel Schedules\3690_Elec Panel Sch Working.xlsm");
 
@@ -71,8 +75,8 @@ namespace ElectricalToolSuite.ScheduleImport
                 while (secData.NumberOfColumns > colCount)
                     secData.RemoveColumn(secData.LastColumnNumber);
 
-                Debug.Assert(secData.LastColumnNumber - secData.FirstColumnNumber + 1 == colCount);
-                Debug.Assert(secData.LastRowNumber - secData.FirstRowNumber + 1 == rowCount);
+//                Debug.Assert(secData.LastColumnNumber - secData.FirstColumnNumber + 1 == colCount);
+//                Debug.Assert(secData.LastRowNumber - secData.FirstRowNumber + 1 == rowCount);
 
                 var overrideOptions = new TableCellStyleOverrideOptions
                 {
@@ -128,6 +132,8 @@ namespace ElectricalToolSuite.ScheduleImport
 
                 for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
                     secData.SetRowHeightInPixels(rowIndex + secData.FirstRowNumber, (int)(rowHeights[rowIndex] * 4.0 / 3.0));
+
+                watch.Stop();
             }
             finally
             {
@@ -135,6 +141,10 @@ namespace ElectricalToolSuite.ScheduleImport
                 excelApplication.Quit();
                 excelApplication.Dispose();
             }
+
+            var elapsed = watch.Elapsed;
+
+            TaskDialog.Show("Elapsed", elapsed.ToString());
             
             return Result.Succeeded;
         }
@@ -222,29 +232,37 @@ namespace ElectricalToolSuite.ScheduleImport
 
         private List<Cell> CreateCells(Excel.Range range)
         {
-            var cells = new ConcurrentBag<Cell>();
+            var cells = new List<Cell>();
 
-            Parallel.ForEach(range.ToList(), cell =>
+            int numberOfColumns = range.Columns.Count;
+            int numberOfRows = range.Rows.Count;
+
+            for (int i = 1; i <= numberOfRows; ++i)
             {
-                if (!((bool) cell.MergeCells && !cell.MergeArea.Address.StartsWith(cell.Address)))
-                    cells.Add(CreateCell(cell));
-            });
+                for (int j = 1; j <= numberOfColumns; ++j)
+                {
+                    var cell = range[i, j];
+                    if (!((bool) cell.MergeCells && !cell.MergeArea.Address.StartsWith(cell.Address)))
+                        cells.Add(CreateCell(cell));
+                }
+            }
 
-            return cells.ToList();
+            return cells;
         }
 
         private Cell CreateCell(Excel.Range r)
         {
+            var font = r.Font;
             var cell = new Cell
             {
                 RowIndex = r.Row-1,
                 ColumnIndex = r.Column-1,
                 Text = (r.Text ?? r.Value2 ?? r.Value ?? "").ToString(),
-                FontName = (string) r.Font.Name,
-                FontSize = (double) r.Font.Size,
-                FontBold = (bool) r.Font.Bold,
-                FontItalic = (bool) r.Font.Italic,
-                FontUnderline = ConvertUnderline((XlUnderlineStyle) r.Font.Underline),
+                FontName = (string) font.Name,
+                FontSize = (double) font.Size,
+                FontBold = (bool) font.Bold,
+                FontItalic = (bool) font.Italic,
+                FontUnderline = ConvertUnderline((XlUnderlineStyle) font.Underline),
                 // TODO text colour
                 // TODO background colour
                 // TODO background shading (?)
@@ -257,8 +275,8 @@ namespace ElectricalToolSuite.ScheduleImport
             if ((bool) r.MergeCells)
             {
                 var mergeArea = r.MergeArea;
-                cell.NumberOfColumns = mergeArea.Select(c => c.Column).Distinct().Count();
-                cell.NumberOfRows = mergeArea.Select(c => c.Row).Distinct().Count();
+                cell.NumberOfColumns = mergeArea.Columns.Count;
+                cell.NumberOfRows = mergeArea.Rows.Count;
             }
             else
             {

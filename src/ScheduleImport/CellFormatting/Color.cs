@@ -1,6 +1,6 @@
 ﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    internal struct Color
+    public struct Color
     {
         public byte Red { get; set; }
         public byte Green { get; set; }

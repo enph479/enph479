@@ -13,6 +13,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "ElectricalToolSuiteInstalle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport", "ScheduleImport\ScheduleImport.csproj", "{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport.Benchmarks", "ScheduleImport.Benchmarks\ScheduleImport.Benchmarks.csproj", "{BD2E82FB-8E87-4F79-98E4-96614B7CB288}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,9 @@ Global
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD2E82FB-8E87-4F79-98E4-96614B7CB288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD2E82FB-8E87-4F79-98E4-96614B7CB288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD2E82FB-8E87-4F79-98E4-96614B7CB288}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
