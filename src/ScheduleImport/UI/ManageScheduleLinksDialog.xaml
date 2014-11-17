@@ -6,17 +6,23 @@
              xmlns:ui="clr-namespace:ElectricalToolSuite.ScheduleImport.UI"
              mc:Ignorable="d" 
              d:DesignHeight="467" d:DesignWidth="674" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Width="800" Height="450"
-        d:DataContext="{d:DesignInstance ui:ManageScheduleLinksDialog}">
+        d:DataContext="{d:DesignInstance ui:ManageScheduleLinksDialog}" Title="Manage Schedule Links">
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" CanExecute="CommandBinding_CanExecute"/>
     </Window.CommandBindings>
     <Grid>
-        <DataGrid x:Name="ManagedScheduleLinksDataGrid" Margin="30,30,30,100" SelectionMode="Single" AutoGenerateColumns="True" SelectedCellsChanged="ManagedScheduleLinksDataGrid_SelectedCellsChanged"/>
-        <Button x:Name="ReloadButton" Content="Reload" HorizontalAlignment="Left" Margin="30,340,0,0" VerticalAlignment="Top" Width="75" IsEnabled="False" Click="ReloadButton_Click"/>
-        <Button x:Name="ReloadFromButton" Content="Reload From..." HorizontalAlignment="Left" Margin="120,340,0,0" VerticalAlignment="Top" Width="100" IsEnabled="False" Click="ReloadFromButton_Click"/>
-        <Button x:Name="RemoveButton" Content="Remove" HorizontalAlignment="Left" Margin="235,340,0,0" VerticalAlignment="Top" Width="75" IsEnabled="False" Click="RemoveButton_Click"/>
-        <Button x:Name="OkButton" Content="OK" HorizontalAlignment="Right" Margin="0,0,179,21" VerticalAlignment="Bottom" Width="75" Command="ApplicationCommands.Close"/>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,19,21" VerticalAlignment="Bottom" Width="75" IsCancel="True"/>
-        <Button x:Name="ApplyButton" Content="Apply" Margin="0,0,99,21" IsEnabled="False" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
+        <DataGrid x:Name="ManagedScheduleLinksDataGrid" IsReadOnly="True" Margin="30,10,30,100" SelectionMode="Single" AutoGenerateColumns="False" SelectedCellsChanged="ManagedScheduleLinksDataGrid_SelectedCellsChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Panel" Binding="{Binding ScheduleName}" />
+                <DataGridTextColumn Header="Workbook Path" Binding="{Binding WorkbookPath}" Width="*"/>
+                <DataGridTextColumn Header="Worksheet" Binding="{Binding WorksheetName}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="ReloadButton" Content="Reload" HorizontalAlignment="Left" Margin="30,326,0,0" VerticalAlignment="Top" Width="75" IsEnabled="False" Click="ReloadButton_Click" Height="25"/>
+        <Button x:Name="ReloadFromButton" Content="Reload From..." HorizontalAlignment="Left" Margin="110,326,0,0" VerticalAlignment="Top" Width="100" IsEnabled="False" Click="ReloadFromButton_Click" Height="25"/>
+        <Button x:Name="RemoveButton" Content="Remove" HorizontalAlignment="Left" Margin="215,326,0,0" VerticalAlignment="Top" Width="75" IsEnabled="False" Click="RemoveButton_Click" Height="25"/>
+        <Button x:Name="OkButton" Content="OK" HorizontalAlignment="Right" Margin="0,0,179,13" VerticalAlignment="Bottom" Width="75" Command="ApplicationCommands.Close" Height="25" Click="OkButton_Click"/>
+        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,19,13" VerticalAlignment="Bottom" Width="75" IsCancel="True" Height="25"/>
+        <Button x:Name="ApplyButton" Content="Apply" Margin="0,0,99,13" IsEnabled="False" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
     </Grid>
 </Window>
