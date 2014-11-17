@@ -28,10 +28,8 @@ namespace ElectricalToolSuite.FindAndReplace
 
             var resultsForm = new FindResultsWindow();
             resultsForm.UpdateElements(matchingElements);
-            resultsForm.Show(); //must be show dialog, can't call revit api from outside of this loop
-
-            //uiDocument.Selection.Elements.Clear();
-            //uiDocument.Selection.Elements.Add(resultsForm.SelectedElement);
+            Globals.MatchingElementSet = matchingElements;
+            //resultsForm.Show(); //right now passes the data to the idling loop
 
             return Result.Succeeded;
         }

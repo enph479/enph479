@@ -52,13 +52,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Composition\ButtonAttribute.cs" />
-    <Compile Include="Composition\IRibbonItemMetaData.cs" />
-    <Compile Include="Composition\IButtonMetaData.cs" />
     <Compile Include="Extensions\DockExtensions.cs" />
-    <Compile Include="Extensions\RibbonExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utility\ImageUtilBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -28,12 +28,11 @@ public static class DockExtensions
         return false;
     }
 
-    public static void RegisterDockablePane2(this UIControlledApplication application,
+    public static void RegisterDockablePane2(UIControlledApplication application,
         Guid id, string title,FrameworkElement dockElement, DockablePaneState state )
     {
         var dPid = new DockablePaneId(id);
-
-        var dataProvider = new DockablePaneProviderData {FrameworkElement = dockElement,InitialState = state};
+        var dataProvider = new DockablePaneProviderData {FrameworkElement = dockElement, InitialState = state};
         IDockablePaneProvider provider = new DockPageProvider(dataProvider);
         application.RegisterDockablePane(dPid, title, provider);
     }

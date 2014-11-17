@@ -1,51 +1,72 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using ElectricalToolSuite.FindAndReplace.Composition;
 using Redbolts.DockableUITest.UI;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
     public class ApplicationCommand:IExternalApplication
     {
+        private FindResultsWindow _findResultsWindow;
         public Result OnStartup(UIControlledApplication application)
         {
+            // Add a new ribbon panel
+            RibbonPanel ribbonPanel = application.CreateRibbonPanel("NewRibbonPanel");
+
+            string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
+            PushButtonData buttonData = new PushButtonData("FindCmd",
+            "Find Tool", thisAssemblyPath, "ElectricalToolSuite.FindAndReplace.ExternalCommand");
+
+            ribbonPanel.AddItem(buttonData);
 
             application.Idling += new EventHandler<IdlingEventArgs>(OnIdling);
-            
-            var container = CommandContainer.Instance();
-            if (container.Valid)
-            {
-                container.BuildRibbon(application);
-            }
+            application.Idling += new EventHandler<IdlingEventArgs>(ForceShowDockablePane);
 
             var dPid = new DockablePaneId(DockConstants.Id);
             if (!DockablePane.PaneIsRegistered(dPid))
             {
-                var state = new DockablePaneState {DockPosition = DockPosition.Right};
-                var element = new FindResultsWindow();
-                application.RegisterDockablePane2(DockConstants.Id, DockConstants.Name, element, state);
+                var state = new DockablePaneState();
+                _findResultsWindow = new FindResultsWindow();
+                DockExtensions.RegisterDockablePane2(application, DockConstants.Id, DockConstants.Name, _findResultsWindow, state);
             }
             return Result.Succeeded;
         }
 
-        void OnIdling(object sender, IdlingEventArgs e)
+        private void ForceShowDockablePane(object sender, IdlingEventArgs e)
         {
-            //should be able to call revit API stuff here?
-            // access active document from sender:
-
             var app = sender as UIApplication;
-
-            if (app != null && Globals.SelectedElement != null)
+            var dPid = new DockablePaneId(DockConstants.Id);
+            try
             {
-                UIDocument uidoc = app.ActiveUIDocument;
-                var doc = uidoc.Document;
-                uidoc.Selection.SetElementIds(new Collection<ElementId> {Globals.SelectedElement});
-                Globals.SelectedElement = null;
+                var pane = app.GetDockablePane(dPid);
+                pane.Show();
+                app.Idling -= ForceShowDockablePane;
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
             }
         }
+
+        void OnIdling(object sender, IdlingEventArgs e)
+        {
+            var app = sender as UIApplication;
+
+            if (app != null && Globals.MatchingElementSet != null)
+            {
+                //UIDocument uidoc = app.ActiveUIDocument;
+                //uidoc.Selection.SetElementIds(new Collection<ElementId> {Globals.SelectedElement});
+                _findResultsWindow.UpdateElements(Globals.MatchingElementSet);
+                Globals.MatchingElementSet = null;
+            }
+        }
+
+        
 
         public Result OnShutdown(UIControlledApplication application)
         {
