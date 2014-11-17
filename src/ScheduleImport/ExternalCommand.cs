@@ -58,7 +58,7 @@ namespace ElectricalToolSuite.ScheduleImport
             else
             {
                 schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
-                schedule.ViewName = selectedPanel.Name;
+//                schedule.ViewName = selectedPanel.Name;
             }
 
             var importPath = GetExcelFile();
@@ -66,7 +66,7 @@ namespace ElectricalToolSuite.ScheduleImport
             if (String.IsNullOrWhiteSpace(importPath))
                 return Result.Cancelled;
 
-            ImportSchedule(schedule, importPath);
+//            ImportSchedule(schedule, importPath);
 
             return Result.Succeeded;
 
@@ -97,18 +97,64 @@ namespace ElectricalToolSuite.ScheduleImport
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+
+
             var watch = new Stopwatch();
 
-            var doc = commandData.Application.ActiveUIDocument.Document;
+            var uiDoc = commandData.Application.ActiveUIDocument;
+            var doc = uiDoc.Document;
+
+
+            var selectedPanelRef = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
+
+            var selectedPanel = doc.GetElement(selectedPanelRef) as FamilyInstance;
+
+            if (selectedPanel == null)
+            {
+                TaskDialog.Show("Invalid selection", "Please select a panel.");
+                return Result.Cancelled;
+            }
+
+            var existingSchedule =
+                new FilteredElementCollector(doc).OfClass(typeof(PanelScheduleView))
+                    .Cast<PanelScheduleView>()
+                    .Where(s => s.GetPanel() == selectedPanel.Id)
+                    .Take(1)
+                    .ToList();
+
+            PanelScheduleView schedule = null;
+
+            if (existingSchedule.Any())
+            {
+                var confirmOperation = TaskDialog.Show("Overwrite existing schedule",
+                    "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
+                    TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
+                if (confirmOperation == TaskDialogResult.Cancel)
+                    return Result.Cancelled;
+
+                schedule = existingSchedule.First();
+            }
+            else
+            {
+                schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
+                schedule.ViewName = selectedPanel.Name;
+            }
+
+            string workbookPath;
+            string worksheetName;
 
             using (var excelApplication = new Excel.Application {DisplayAlerts = false})
             {
                 var wnd = new UI.SheetSelectionDialog(excelApplication);
-                wnd.ShowDialog();
+
+                if (wnd.ShowDialog() != true)
+                    return Result.Cancelled;
+
+                workbookPath = wnd.FilePathTextBox.Text;
+                worksheetName = (string) wnd.SheetComboBox.SelectedItem;
+
                 excelApplication.Quit();
             }
-
-            return Result.Cancelled;
 
 //            return TestScheduleCreation(doc, commandData.Application.ActiveUIDocument);
 
@@ -119,23 +165,32 @@ namespace ElectricalToolSuite.ScheduleImport
 
 //            return Result.Succeeded;
 
-            var sch =
-                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
-                    .Cast<PanelScheduleView>()
-                    .First(psv => !psv.IsTemplate);
+//            var sch =
+//                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
+//                    .Cast<PanelScheduleView>()
+//                    .First(psv => !psv.IsTemplate);
 
-            var panelId = sch.GetPanel();
+//            var panelId = sch.GetPanel();
 
-            var panel = doc.GetElement(panelId);
+//            var panel = doc.GetElement(panelId);
 
-            return Result.Cancelled;
+//            return Result.Cancelled;
 
 
 //            return Result.Cancelled;
 
-            if (sch == null)
-                throw new InvalidOperationException("No panel schedules found");
+//            if (sch == null)
+//                throw new InvalidOperationException("No panel schedules found");
 
+//            using (var trans = new Transaction(doc))
+//            {
+//                Debug.Assert(trans.Start(String.Format("Schedule Import - {0}", schedule.Name)) == TransactionStatus.Started);
+                ImportSchedule(schedule, workbookPath, worksheetName);
+//                trans.Commit();
+//            }
+
+            // TODO Put this back in
+//            uiDoc.ActiveView = schedule;
 
             var elapsed = watch.Elapsed;
 
@@ -144,7 +199,7 @@ namespace ElectricalToolSuite.ScheduleImport
             return Result.Succeeded;
         }
 
-        private void ImportSchedule(PanelScheduleView schedule, string excelFilePath)
+        private void ImportSchedule(PanelScheduleView schedule, string workbookPath, string worksheetName)
         {
             var tbl = schedule.GetTableData();
 
@@ -220,12 +275,12 @@ namespace ElectricalToolSuite.ScheduleImport
             {
                 var wb = excelApplication.Workbooks.Open(
 //                    @"C:\Users\Blake\Google Drive\ENPH 479 Revit Project\Electrical Panel Schedules\3690_Elec Panel Sch Working.xlsm",
-                    excelFilePath,
+                    workbookPath,
                     false, true);
 
                 Debug.Assert(wb != null);
 
-                var ws = (Excel.Worksheet)wb.Worksheets[1];
+                var ws = wb.Worksheets.Cast<Excel.Worksheet>().First(s => s.Name == worksheetName);
 
                 Debug.Assert(ws != null);
 
@@ -569,5 +624,6 @@ namespace ElectricalToolSuite.ScheduleImport
 
             return cell;
         }
+
     }
 }
