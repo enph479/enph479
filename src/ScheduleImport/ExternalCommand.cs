@@ -6,6 +6,7 @@ using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 using System;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
@@ -61,12 +62,15 @@ namespace ElectricalToolSuite.ScheduleImport
 //                schedule.ViewName = selectedPanel.Name;
             }
 
+
+
             var importPath = GetExcelFile();
 
             if (String.IsNullOrWhiteSpace(importPath))
                 return Result.Cancelled;
 
 //            ImportSchedule(schedule, importPath);
+
 
             return Result.Succeeded;
 
@@ -140,6 +144,9 @@ namespace ElectricalToolSuite.ScheduleImport
                 schedule.ViewName = selectedPanel.Name;
             }
 
+            if (PrintImportInformation(schedule))
+                return Result.Cancelled;
+
             string workbookPath;
             string worksheetName;
 
@@ -189,6 +196,8 @@ namespace ElectricalToolSuite.ScheduleImport
 //                trans.Commit();
 //            }
 
+            StoreImportInformation(schedule, workbookPath, worksheetName);
+            
             // TODO Put this back in
 //            uiDoc.ActiveView = schedule;
 
@@ -625,5 +634,67 @@ namespace ElectricalToolSuite.ScheduleImport
             return cell;
         }
 
+        private static readonly Guid SchemaGuid = new Guid("9068d9ed-3e98-425f-9940-76da5c52f923");
+
+        private static Schema GetSchema()
+        {
+            var schema = Schema.Lookup(SchemaGuid);
+
+            if (schema != null)
+                return schema;
+
+            var schemaBuilder = new SchemaBuilder(SchemaGuid);
+
+            schemaBuilder.SetReadAccessLevel(AccessLevel.Public);
+            schemaBuilder.SetWriteAccessLevel(AccessLevel.Public); // TODO
+//            schemaBuilder.SetVendorId("ENPH 479");
+            schemaBuilder.SetSchemaName("ExcelScheduleImport");
+
+            var fieldBuilder = schemaBuilder.AddSimpleField("ExcelPath", typeof(string));
+            fieldBuilder.SetDocumentation("The path to the Excel workbook from which this schedule was created.");
+
+            fieldBuilder = schemaBuilder.AddSimpleField("ExcelWorksheetName", typeof(string));
+            fieldBuilder.SetDocumentation("The name of the Excel worksheet within the workbook from which this schedule was created.");
+
+            return schemaBuilder.Finish();
+        }
+
+        private bool PrintImportInformation(PanelScheduleView schedule)
+        {
+            var schema = GetSchema();
+            var entity = schedule.GetEntity(schema);
+
+            if (entity != null && entity.IsValid())
+            {
+                var pathField = schema.GetField("ExcelPath");
+                var workbookPath = entity.Get<string>(pathField);
+
+                var sheetField = schema.GetField("ExcelWorksheetName");
+                var worksheetName = entity.Get<string>(sheetField);
+
+                TaskDialog.Show("Schedule Already Imported",
+                    String.Format(
+                        "This schedule has already been imported, from the sheet '{0}' in the workbook located at {1}.",
+                        worksheetName, workbookPath));
+                return true;
+            }
+
+            return false;
+        }
+
+        void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName)
+        {
+            var schema = GetSchema();
+
+            var entity = new Entity(schema);
+
+            var pathField = schema.GetField("ExcelPath");
+            entity.Set(pathField, workbookPath);
+
+            var sheetField = schema.GetField("ExcelWorksheetName");
+            entity.Set(sheetField, worksheetName);
+
+            schedule.SetEntity(entity);
+        }
     }
 }
