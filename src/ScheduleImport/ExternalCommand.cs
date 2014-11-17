@@ -10,6 +10,7 @@ using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 using System;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
+using ElectricalToolSuite.ScheduleImport.UI;
 using Microsoft.Win32;
 using NetOffice.ExcelApi.Enums;
 using Color = Autodesk.Revit.DB.Color;
@@ -144,8 +145,8 @@ namespace ElectricalToolSuite.ScheduleImport
                 schedule.ViewName = selectedPanel.Name;
             }
 
-            if (PrintImportInformation(schedule))
-                return Result.Cancelled;
+//            if (PrintImportInformation(schedule))
+//                return Result.Cancelled;
 
             string workbookPath;
             string worksheetName;
@@ -203,12 +204,43 @@ namespace ElectricalToolSuite.ScheduleImport
 
             var elapsed = watch.Elapsed;
 
-            TaskDialog.Show("Elapsed", elapsed.ToString());
-            
+//            TaskDialog.Show("Elapsed", elapsed.ToString());
+
+            var mgWnd = new UI.ManageScheduleLinksDialog(doc);
+
+            var managedSchedules = GetManagedSchedules(doc);
+
+            mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
+
+            mgWnd.ShowDialog();
+
             return Result.Succeeded;
         }
 
-        private void ImportSchedule(PanelScheduleView schedule, string workbookPath, string worksheetName)
+        public static List<ManagedScheduleLink> GetManagedSchedules(Document doc)
+        {
+            var schema = GetSchema();
+
+            var linkedSchedules = new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
+                .Where(s => s.GetEntity(schema).IsValid())
+                .Cast<PanelScheduleView>();
+
+            var wbFld = schema.GetField("ExcelPath");
+            var wsFld = schema.GetField("ExcelWorksheetName");
+
+            var managedSchedules =
+                (from sched in linkedSchedules
+                    let ent = sched.GetEntity(schema)
+                    let wbPath = ent.Get<string>(wbFld)
+                    let wsName = ent.Get<string>(wsFld)
+                    select new UI.ManagedScheduleLink(sched, wbPath, wsName))
+                    .OrderBy(l => l.ScheduleName)
+                    .ToList();
+
+            return managedSchedules;
+        }
+
+        public static void ImportSchedule(PanelScheduleView schedule, string workbookPath, string worksheetName)
         {
             var tbl = schedule.GetTableData();
 
@@ -430,12 +462,12 @@ namespace ElectricalToolSuite.ScheduleImport
 
         }
 
-        private Color ConvertColor(System.Drawing.Color color)
+        private static Color ConvertColor(System.Drawing.Color color)
         {
             return new Color(color.R, color.G, color.B);
         }
 
-        private HorizontalAlignment ConvertHorizontalAlignment(XlHAlign alignment)
+        private static HorizontalAlignment ConvertHorizontalAlignment(XlHAlign alignment)
         {
             switch (alignment)
             {
@@ -455,7 +487,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private VerticalAlignment ConvertVerticalAlignment(XlVAlign alignment)
+        private static VerticalAlignment ConvertVerticalAlignment(XlVAlign alignment)
         {
             switch (alignment)
             {
@@ -472,7 +504,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private bool ConvertUnderline(XlUnderlineStyle underline)
+        private static bool ConvertUnderline(XlUnderlineStyle underline)
         {
             switch (underline)
             {
@@ -486,7 +518,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private HorizontalAlignmentStyle ConvertHorizontalAlignment(HorizontalAlignment alignment)
+        private static HorizontalAlignmentStyle ConvertHorizontalAlignment(HorizontalAlignment alignment)
         {
             switch (alignment)
             {
@@ -501,7 +533,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private VerticalAlignmentStyle ConvertVerticalAlignment(VerticalAlignment alignment)
+        private static VerticalAlignmentStyle ConvertVerticalAlignment(VerticalAlignment alignment)
         {
             switch (alignment)
             {
@@ -516,7 +548,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private List<Cell> CreateCells(Excel.Range range)
+        private static List<Cell> CreateCells(Excel.Range range)
         {
             var cells = new List<Cell>();
 
@@ -538,7 +570,7 @@ namespace ElectricalToolSuite.ScheduleImport
             return cells;
         }
 
-        private Orientation ConvertOrientation(XlOrientation excelOrientation)
+        private static Orientation ConvertOrientation(XlOrientation excelOrientation)
         {
             switch (excelOrientation)
             {
@@ -555,7 +587,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private int ConvertOrientation(Orientation orientation)
+        private static int ConvertOrientation(Orientation orientation)
         {
             switch (orientation)
             {
@@ -569,7 +601,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private BorderLineStyle ConvertBorder(Excel.Border border)
+        private static BorderLineStyle ConvertBorder(Excel.Border border)
         {
             var style = (XlLineStyle) border.LineStyle;
 
@@ -582,7 +614,7 @@ namespace ElectricalToolSuite.ScheduleImport
             }
         }
 
-        private Cell CreateCell(Excel.Range interopCell, int rowIndex, int columnIndex)
+        private static Cell CreateCell(Excel.Range interopCell, int rowIndex, int columnIndex)
         {
             var font = interopCell.Font;
             var borders = interopCell.Borders;
@@ -636,7 +668,7 @@ namespace ElectricalToolSuite.ScheduleImport
 
         private static readonly Guid SchemaGuid = new Guid("9068d9ed-3e98-425f-9940-76da5c52f923");
 
-        private static Schema GetSchema()
+        public static Schema GetSchema()
         {
             var schema = Schema.Lookup(SchemaGuid);
 
@@ -682,7 +714,7 @@ namespace ElectricalToolSuite.ScheduleImport
             return false;
         }
 
-        void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName)
+        public static void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName)
         {
             var schema = GetSchema();
 
