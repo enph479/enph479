@@ -11,7 +11,7 @@
       d:DesignWidth="300"
       mc:Ignorable="d">
     <Grid Background="BlueViolet">
-        <ListView HorizontalAlignment="Left" Height="auto" Margin="0,54,0,0" VerticalAlignment="Top" Width="auto" x:Name="ListOfMatchingElements">
+        <ListView HorizontalAlignment="Left" Height="auto" Margin="0,54,0,0" VerticalAlignment="Top" Width="auto" x:Name="ListOfMatchingElements" MouseDoubleClick="GetSelectedElementFromResults">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Family Name" DisplayMemberBinding ="{Binding Path=Symbol.Family.Name}"/>

@@ -13,7 +13,6 @@ namespace ElectricalToolSuite.FindAndReplace
         public FindResultsWindow()
         {
             InitializeComponent();
-            //ListOfMatchingElements.AddHandler(, new RoutedEventHandler(GetSelectedElementFromResults));
             var temp = new ElementSet();
             temp.Insert(null);
             UpdateElements(temp);
@@ -28,7 +27,6 @@ namespace ElectricalToolSuite.FindAndReplace
         {
             var castedSender = ((ListBox) sender);
             Globals.SelectedElement = ((Element)castedSender.SelectedItem).Id;
-            //Close();
         } 
     }
 }

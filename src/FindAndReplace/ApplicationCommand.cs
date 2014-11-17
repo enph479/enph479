@@ -59,10 +59,14 @@ namespace ElectricalToolSuite.FindAndReplace
 
             if (app != null && Globals.MatchingElementSet != null)
             {
-                //UIDocument uidoc = app.ActiveUIDocument;
-                //uidoc.Selection.SetElementIds(new Collection<ElementId> {Globals.SelectedElement});
                 _findResultsWindow.UpdateElements(Globals.MatchingElementSet);
                 Globals.MatchingElementSet = null;
+            }
+            if (app != null && Globals.SelectedElement != null)
+            {
+                UIDocument uidoc = app.ActiveUIDocument;
+                uidoc.Selection.SetElementIds(new Collection<ElementId> {Globals.SelectedElement});
+                Globals.SelectedElement = null;
             }
         }
 
