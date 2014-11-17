@@ -101,7 +101,16 @@ namespace ElectricalToolSuite.ScheduleImport
 
             var doc = commandData.Application.ActiveUIDocument.Document;
 
-            return TestScheduleCreation(doc, commandData.Application.ActiveUIDocument);
+            using (var excelApplication = new Excel.Application {DisplayAlerts = false})
+            {
+                var wnd = new UI.SheetSelectionDialog(excelApplication);
+                wnd.ShowDialog();
+                excelApplication.Quit();
+            }
+
+            return Result.Cancelled;
+
+//            return TestScheduleCreation(doc, commandData.Application.ActiveUIDocument);
 
 //            return Result.Cancelled;
 
