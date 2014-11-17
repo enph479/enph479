@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using Excel = NetOffice.ExcelApi;
 
@@ -22,7 +11,7 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     /// <summary>
     /// Interaction logic for SheetSelectionDialog.xaml
     /// </summary>
-    public partial class SheetSelectionDialog : Window
+    public partial class SheetSelectionDialog
     {
         public bool HasValidExcelFile { get; set; }
         private readonly Excel.Application _excelApplication;
@@ -95,7 +84,7 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
         private void OpenWorkbookButton_Click(object sender, RoutedEventArgs e)
         {
-            var process = Process.Start(FilePathTextBox.Text);
+            Process.Start(FilePathTextBox.Text);
         }
     }
 }

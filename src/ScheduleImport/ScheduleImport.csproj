@@ -76,7 +76,6 @@
     <Compile Include="CellFormatting\HorizontalAlignment.cs" />
     <Compile Include="CellFormatting\Orientation.cs" />
     <Compile Include="CellFormatting\VerticalAlignment.cs" />
-    <Compile Include="ColorExtensions.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

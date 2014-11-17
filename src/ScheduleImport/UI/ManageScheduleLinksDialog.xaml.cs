@@ -1,32 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using ElectricalToolSuite.ScheduleImport.Annotations;
 
 namespace ElectricalToolSuite.ScheduleImport.UI
 {
     /// <summary>
     /// Interaction logic for ManageScheduleLinksDialog.xaml
     /// </summary>
-    public partial class ManageScheduleLinksDialog : Window
+    public partial class ManageScheduleLinksDialog
     {
-        private Document _document;
+        private readonly Document _document;
 
         public ManageScheduleLinksDialog(Document document)
         {
@@ -60,12 +45,9 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             var workbookPath = selectedLink.WorkbookPath;
             var worksheetName = selectedLink.WorksheetName;
 
-            var prevCurs = Cursor;
             Cursor = Cursors.Wait;
-
             ExternalCommand.ImportSchedule(schedule, workbookPath, worksheetName);
-
-            Cursor = prevCurs;
+            Cursor = Cursors.Arrow;
         }
 
         private void ReloadFromButton_Click(object sender, RoutedEventArgs e)
@@ -75,7 +57,7 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             using (var excelApplication = new NetOffice.ExcelApi.Application { DisplayAlerts = false })
             {
-                var wnd = new UI.SheetSelectionDialog(excelApplication);
+                var wnd = new SheetSelectionDialog(excelApplication);
 
                 if (wnd.ShowDialog() != true)
                     return;
@@ -91,11 +73,10 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             var schema = ExternalCommand.GetSchema();
             Debug.Assert(schedule.DeleteEntity(schema));
 
-            var prevCurs = Cursor;
             Cursor = Cursors.Wait;
             ExternalCommand.ImportSchedule(schedule, workbookPath, worksheetName);
             ExternalCommand.StoreImportInformation(schedule, workbookPath, worksheetName);
-            Cursor = prevCurs;
+            Cursor = Cursors.Arrow;
 
             ManagedScheduleLinksDataGrid.ItemsSource = ExternalCommand.GetManagedSchedules(_document);
             ManagedScheduleLinksDataGrid.Items.Refresh();
@@ -109,10 +90,9 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             var schema = ExternalCommand.GetSchema();
             Debug.Assert(schedule.DeleteEntity(schema));
 
-            var prevCurs = Cursor;
             Cursor = Cursors.Wait;
             ManagedScheduleLinksDataGrid.ItemsSource = ExternalCommand.GetManagedSchedules(_document);
-            Cursor = prevCurs;
+            Cursor = Cursors.Arrow;
 
             ManagedScheduleLinksDataGrid.Items.Refresh();
         }
