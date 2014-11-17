@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -8,6 +9,7 @@ using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.UI;
 using System;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
+using Microsoft.Win32;
 using NetOffice.ExcelApi.Enums;
 using Color = Autodesk.Revit.DB.Color;
 using Orientation = ElectricalToolSuite.ScheduleImport.CellFormatting.Orientation;
@@ -18,11 +20,90 @@ namespace ElectricalToolSuite.ScheduleImport
     [Transaction(TransactionMode.Automatic)]
     public class ExternalCommand : IExternalCommand
     {
+        private Result TestScheduleCreation(Document doc, UIDocument uiDoc)
+        {
+//            var panelScheduleCategory = BuiltInCategory.OST_BranchPanelScheduleTemplates;
+
+//            var vs = ViewSchedule.CreateSchedule(doc, new ElementId(panelScheduleCategory));
+
+            var selectedPanelRef = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
+
+            var selectedPanel = doc.GetElement(selectedPanelRef) as FamilyInstance;
+
+            if (selectedPanel == null)
+            {
+                TaskDialog.Show("Invalid selection", "Please select a panel.");
+                return Result.Cancelled;
+            }
+
+            var existingSchedule =
+                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
+                    .Cast<PanelScheduleView>()
+                    .Where(sch => sch.GetPanel() == selectedPanel.Id)
+                    .Take(1)
+                    .ToList();
+
+            PanelScheduleView schedule = null;
+
+            if (existingSchedule.Any())
+            {
+                var confirmOperation = TaskDialog.Show("Overwrite existing schedule",
+                    "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
+                    TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
+                if (confirmOperation == TaskDialogResult.Cancel)
+                    return Result.Cancelled;
+
+                schedule = existingSchedule.First();
+            }
+            else
+            {
+                schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
+                schedule.ViewName = selectedPanel.Name;
+            }
+
+            var importPath = GetExcelFile();
+
+            if (String.IsNullOrWhiteSpace(importPath))
+                return Result.Cancelled;
+
+            ImportSchedule(schedule, importPath);
+
+            return Result.Succeeded;
+
+//            vs.ViewName = "SHOOP DA WHOOP";
+        }
+
+        private string GetExcelFile()
+        {
+            // Create an instance of the open file dialog box.
+            OpenFileDialog fileDialog = new OpenFileDialog();
+
+            // Set filter options and filter index.
+            fileDialog.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+
+            fileDialog.Multiselect = false;
+
+            // Call the ShowDialog method to show the dialog box.
+            bool? userClickedOK = fileDialog.ShowDialog();
+
+            // Process input if the user clicked OK.
+            if (userClickedOK == true)
+            {
+                return fileDialog.FileName;
+            }
+
+            return null;
+        }
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             var watch = new Stopwatch();
 
             var doc = commandData.Application.ActiveUIDocument.Document;
+
+            return TestScheduleCreation(doc, commandData.Application.ActiveUIDocument);
+
+//            return Result.Cancelled;
 
 //            var gfxStyles =
 //                new FilteredElementCollector(doc).OfClass(typeof (GraphicsStyle)).Cast<GraphicsStyle>().ToList();
@@ -34,11 +115,30 @@ namespace ElectricalToolSuite.ScheduleImport
                     .Cast<PanelScheduleView>()
                     .First(psv => !psv.IsTemplate);
 
+            var panelId = sch.GetPanel();
+
+            var panel = doc.GetElement(panelId);
+
+            return Result.Cancelled;
+
+
+//            return Result.Cancelled;
+
             if (sch == null)
                 throw new InvalidOperationException("No panel schedules found");
 
-            var tbl = sch.GetTableData();
+
+            var elapsed = watch.Elapsed;
+
+            TaskDialog.Show("Elapsed", elapsed.ToString());
             
+            return Result.Succeeded;
+        }
+
+        private void ImportSchedule(PanelScheduleView schedule, string excelFilePath)
+        {
+            var tbl = schedule.GetTableData();
+
             tbl.GetSectionData(SectionType.Header).HideSection = true;
             tbl.GetSectionData(SectionType.Footer).HideSection = true;
             tbl.GetSectionData(SectionType.Summary).HideSection = true;
@@ -47,82 +147,81 @@ namespace ElectricalToolSuite.ScheduleImport
             if (secData.NeedsRefresh)
                 secData.RefreshData();
 
-//            var lineStyleIds = new HashSet<ElementId>();
+            //            var lineStyleIds = new HashSet<ElementId>();
 
-//            for (int i = secData.FirstRowNumber; i <= secData.LastRowNumber; ++i)
-//                for (int j = secData.FirstColumnNumber; j <= secData.LastColumnNumber; ++j)
-//                {
-//                    try
-//                    {
-//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderTopLineStyle);
-//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderBottomLineStyle);
-//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderLeftLineStyle);
-//                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderRightLineStyle);
-//                    }
-//                    catch (Exception)
-//                    {
-//                    }
-//                }
+            //            for (int i = secData.FirstRowNumber; i <= secData.LastRowNumber; ++i)
+            //                for (int j = secData.FirstColumnNumber; j <= secData.LastColumnNumber; ++j)
+            //                {
+            //                    try
+            //                    {
+            //                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderTopLineStyle);
+            //                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderBottomLineStyle);
+            //                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderLeftLineStyle);
+            //                        lineStyleIds.Add(secData.GetTableCellStyle(i, j).BorderRightLineStyle);
+            //                    }
+            //                    catch (Exception)
+            //                    {
+            //                    }
+            //                }
 
-//            var sb = new StringBuilder();
-//            foreach (var id in lineStyleIds)
-//            {
-//                var elem = doc.GetElement(id);
-//                var name = "";
-//                if (elem != null) name = elem.Name;
-//                sb.AppendLine(String.Format("{0} - {1}",  name, id.IntegerValue.ToString()));
-//            }
+            //            var sb = new StringBuilder();
+            //            foreach (var id in lineStyleIds)
+            //            {
+            //                var elem = doc.GetElement(id);
+            //                var name = "";
+            //                if (elem != null) name = elem.Name;
+            //                sb.AppendLine(String.Format("{0} - {1}",  name, id.IntegerValue.ToString()));
+            //            }
 
-//            File.WriteAllText(@"C:\users\blake\desktop\linestyleids.txt", sb.ToString());
+            //            File.WriteAllText(@"C:\users\blake\desktop\linestyleids.txt", sb.ToString());
 
-//            return Result.Succeeded;
+            //            return Result.Succeeded;
 
-            Debug.WriteLine(sch.ViewName);
-            Debug.WriteLine(sch.Name);
+            Debug.WriteLine(schedule.ViewName);
+            Debug.WriteLine(schedule.Name);
 
             // start excel and turn off msg boxes
-            var excelApplication = new Excel.Application {DisplayAlerts = false};
+            var excelApplication = new Excel.Application { DisplayAlerts = false };
 
-//            var linesCategory = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Lines);
-//            var lineStyleCategories = linesCategory.SubCategories;
+            //            var linesCategory = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Lines);
+            //            var lineStyleCategories = linesCategory.SubCategories;
 
-            var graphicsStyles = new FilteredElementCollector(doc).OfClass(typeof(GraphicsStyle))
-                    .Cast<GraphicsStyle>().ToList();
+//            var graphicsStyles = new FilteredElementCollector(doc).OfClass(typeof(GraphicsStyle))
+//                    .Cast<GraphicsStyle>().ToList();
 
-            var visibleLineStyleId = 
+            var visibleLineStyleId =
                 new ElementId(BuiltInCategory.OST_CurvesThinLines);
 
-//                graphicsStyles.First(gfx => gfx.Name == "Schedule Default").Id;
-//            var hiddenLineStyleId =
-//                graphicsStyles.First(gfx => gfx.Name == "<Invisible lines>").Id;
+            //                graphicsStyles.First(gfx => gfx.Name == "Schedule Default").Id;
+            //            var hiddenLineStyleId =
+            //                graphicsStyles.First(gfx => gfx.Name == "<Invisible lines>").Id;
 
-//            var sb = new StringBuilder();
+            //            var sb = new StringBuilder();
 
-//            foreach (var cat in cats)
-//            {
-//                sb.AppendLine(String.Format("{0}: {1}, {2}", cat.Name, (cat.GraphicsStyleCategory ?? cat.Category).Name, cat.GraphicsStyleType));
-//            }
+            //            foreach (var cat in cats)
+            //            {
+            //                sb.AppendLine(String.Format("{0}: {1}, {2}", cat.Name, (cat.GraphicsStyleCategory ?? cat.Category).Name, cat.GraphicsStyleType));
+            //            }
 
-//            File.WriteAllText(@"C:\users\blake\desktop\gfxstyles.txt", sb.ToString());
+            //            File.WriteAllText(@"C:\users\blake\desktop\gfxstyles.txt", sb.ToString());
 
-//            return Result.Cancelled;
+            //            return Result.Cancelled;
 
             try
             {
-                watch.Start();
-
                 var wb = excelApplication.Workbooks.Open(
-                    @"C:\Users\Blake\Google Drive\ENPH 479 Revit Project\Electrical Panel Schedules\3690_Elec Panel Sch Working.xlsm",
+//                    @"C:\Users\Blake\Google Drive\ENPH 479 Revit Project\Electrical Panel Schedules\3690_Elec Panel Sch Working.xlsm",
+                    excelFilePath,
                     false, true);
 
                 Debug.Assert(wb != null);
 
-                var ws = (Excel.Worksheet) wb.Worksheets[1];
+                var ws = (Excel.Worksheet)wb.Worksheets[1];
 
                 Debug.Assert(ws != null);
 
                 var usedRange = ws.UsedRange;
-                
+
                 // TODO Fix off-by-one errors
                 int rowCount = usedRange.Rows.Count;
                 int colCount = usedRange.Columns.Count;
@@ -160,7 +259,10 @@ namespace ElectricalToolSuite.ScheduleImport
                 for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
                     for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
                         secData.ClearCell(rowIndex + secData.FirstRowNumber, colIndex + secData.FirstColumnNumber);
-                
+
+                if (secData.NeedsRefresh)
+                    secData.RefreshData();
+
                 var cells = CreateCells(usedRange);
 
                 Debug.Assert(cells.Any());
@@ -187,6 +289,9 @@ namespace ElectricalToolSuite.ScheduleImport
                 for (int col = secData.FirstColumnNumber; col <= secData.LastColumnNumber; ++col)
                     secData.SetCellType(col, CellType.Text);
 
+                if (secData.NeedsRefresh)
+                    secData.RefreshData();
+
                 foreach (var cell in cells)
                 {
                     var mergedCell = new TableMergedCell(
@@ -197,11 +302,14 @@ namespace ElectricalToolSuite.ScheduleImport
 
                     secData.MergeCells(mergedCell);
                 }
-                
+
+                if (secData.NeedsRefresh)
+                    secData.RefreshData();
+
                 foreach (var cell in cells)
                 {
-                    secData.SetCellText(cell.RowIndex + secData.FirstRowNumber, 
-                        cell.ColumnIndex + secData.FirstColumnNumber, 
+                    secData.SetCellText(cell.RowIndex + secData.FirstRowNumber,
+                        cell.ColumnIndex + secData.FirstColumnNumber,
                         cell.Text ?? "");
 
                     var fmt = new TableCellStyle();
@@ -226,21 +334,19 @@ namespace ElectricalToolSuite.ScheduleImport
                     fmt.BorderTopLineStyle = cell.TopBorderLine == BorderLineStyle.Border
                         ? visibleLineStyleId
                         : ElementId.InvalidElementId;
-                    
+
                     fmt.BorderLeftLineStyle = cell.LeftBorderLine == BorderLineStyle.Border
                         ? visibleLineStyleId
                         : ElementId.InvalidElementId;
-                    
+
                     fmt.BorderRightLineStyle = cell.RightBorderLine == BorderLineStyle.Border
                         ? visibleLineStyleId
                         : ElementId.InvalidElementId;
-                    
-                    secData.SetCellStyle(cell.RowIndex + secData.FirstRowNumber, 
-                        cell.ColumnIndex + secData.FirstColumnNumber, 
+
+                    secData.SetCellStyle(cell.RowIndex + secData.FirstRowNumber,
+                        cell.ColumnIndex + secData.FirstColumnNumber,
                         fmt);
                 }
-
-                watch.Stop();
             }
             finally
             {
@@ -249,11 +355,6 @@ namespace ElectricalToolSuite.ScheduleImport
                 excelApplication.Dispose();
             }
 
-            var elapsed = watch.Elapsed;
-
-            TaskDialog.Show("Elapsed", elapsed.ToString());
-            
-            return Result.Succeeded;
         }
 
         private Color ConvertColor(System.Drawing.Color color)
