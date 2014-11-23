@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 
 namespace ElectricalToolSuite.FindAndReplace
@@ -7,9 +8,11 @@ namespace ElectricalToolSuite.FindAndReplace
     class TextFinder
     {
         private readonly String _searchText;
-        public TextFinder(String searchText)
+        private readonly RegexOptions _compareOptions;
+        public TextFinder(String searchText, RegexOptions compareOptions, Document document)
         {
-            this._searchText = searchText;
+            _searchText = searchText;
+            _compareOptions = compareOptions;
         }
 
         public ElementSet FindMatchingElements(FilteredElementCollector allElements)
@@ -19,14 +22,14 @@ namespace ElectricalToolSuite.FindAndReplace
             {
                 foreach (Parameter param in elem.Parameters)
                 {
-                    if (!String.IsNullOrEmpty(param.AsString()) && param.AsString().Contains(_searchText))
-                    {
-                        matchingElements.Insert(elem);
-                    }
+                    if (!String.IsNullOrEmpty(param.AsString())
+                        && Regex.Match(param.AsString(), _searchText, _compareOptions).Success)
+                        {
+                            matchingElements.Insert(elem);
+                        }
                 }
             }
             return matchingElements;
         }
-
     }
 }

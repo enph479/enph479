@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Windows;
-using Autodesk.Revit.Attributes;
+﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System.Linq;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
@@ -15,22 +13,29 @@ namespace ElectricalToolSuite.FindAndReplace
         {
             var findForm = new FindAndReplaceWindow();
             findForm.ShowDialog();
-            var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings());
+            if (findForm.NotCancelled)
+            {
+                //force show the dockable pane on search
+                //var dPid = new DockablePaneId(DockConstants.Id);
+                //var pane = commandData.Application.GetDockablePane(dPid);
+                //pane.Show();
 
-            var uiDocument = commandData.Application.ActiveUIDocument;
-            var document = uiDocument.Document;
-            
-            var collector = new FilteredElementCollector(document);
+                var uiDocument = commandData.Application.ActiveUIDocument;
+                var document = uiDocument.Document;
 
-            //currently getting ALL elements is really slow.
-            var allElements = collector.OfClass(typeof (FamilyInstance));
-            var matchingElements = textFinder.FindMatchingElements(allElements);
+                var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings(), document);
 
-            var resultsForm = new FindResultsWindow();
-            resultsForm.UpdateElements(matchingElements);
-            Globals.MatchingElementSet = matchingElements;
-            //resultsForm.Show(); //right now passes the data to the idling loop
+                var collector = new FilteredElementCollector(document);
 
+                var allElements = collector.OfClass(typeof (TextElement));
+                var debugging = allElements.OfType<AnnotationSymbol>();
+                var matchingElements = textFinder.FindMatchingElements(allElements);
+
+                var resultsForm = new DebugFindResult();
+                resultsForm.UpdateElements(matchingElements);
+                resultsForm.ShowDialog();
+                Globals.MatchingElementSet = matchingElements;                
+            }
             return Result.Succeeded;
         }
     }

@@ -83,6 +83,9 @@
       <DependentUpon>FindAndReplaceWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="FinderSettings.cs" />
+    <Compile Include="DebugFindResults.xaml.cs">
+      <DependentUpon>DebugFindResults.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FindResultsWindow.xaml.cs">
       <DependentUpon>FindResultsWindow.xaml</DependentUpon>
     </Compile>
@@ -102,6 +105,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="DebugFindResults.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="FindResultsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

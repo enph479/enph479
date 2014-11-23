@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using Redbolts.DockableUITest.UI;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
     public class ApplicationCommand:IExternalApplication
     {
-        private FindResultsWindow _findResultsWindow;
+        private FindResultsWindow _resultsWindow;
         public Result OnStartup(UIControlledApplication application)
         {
             // Add a new ribbon panel
@@ -25,27 +23,27 @@ namespace ElectricalToolSuite.FindAndReplace
             ribbonPanel.AddItem(buttonData);
 
             application.Idling += new EventHandler<IdlingEventArgs>(OnIdling);
-            application.Idling += new EventHandler<IdlingEventArgs>(ForceShowDockablePane);
+            application.Idling += new EventHandler<IdlingEventArgs>(ForceHideDockablePane);
 
             var dPid = new DockablePaneId(DockConstants.Id);
             if (!DockablePane.PaneIsRegistered(dPid))
             {
                 var state = new DockablePaneState();
-                _findResultsWindow = new FindResultsWindow();
-                DockExtensions.RegisterDockablePane2(application, DockConstants.Id, DockConstants.Name, _findResultsWindow, state);
+                _resultsWindow = new FindResultsWindow();
+                DockExtensions.RegisterDockablePane2(application, DockConstants.Id, DockConstants.Name, _resultsWindow, state);
             }
             return Result.Succeeded;
         }
 
-        private void ForceShowDockablePane(object sender, IdlingEventArgs e)
+        private void ForceHideDockablePane(object sender, IdlingEventArgs e)
         {
             var app = sender as UIApplication;
             var dPid = new DockablePaneId(DockConstants.Id);
             try
             {
                 var pane = app.GetDockablePane(dPid);
-                pane.Show();
-                app.Idling -= ForceShowDockablePane;
+                pane.Hide();
+                app.Idling -= ForceHideDockablePane;
             }
             catch (Exception exception)
             {
@@ -59,19 +57,18 @@ namespace ElectricalToolSuite.FindAndReplace
 
             if (app != null && Globals.MatchingElementSet != null)
             {
-                _findResultsWindow.UpdateElements(Globals.MatchingElementSet);
+                _resultsWindow.UpdateElements(Globals.MatchingElementSet);
                 Globals.MatchingElementSet = null;
             }
             if (app != null && Globals.SelectedElement != null)
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 uidoc.Selection.SetElementIds(new Collection<ElementId> {Globals.SelectedElement});
+                
                 Globals.SelectedElement = null;
             }
         }
-
         
-
         public Result OnShutdown(UIControlledApplication application)
         {
             return Result.Succeeded;

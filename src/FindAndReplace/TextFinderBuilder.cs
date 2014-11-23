@@ -1,11 +1,28 @@
-﻿namespace ElectricalToolSuite.FindAndReplace
+﻿using System;
+using System.Text.RegularExpressions;
+using Autodesk.Revit.Creation;
+using Document = Autodesk.Revit.DB.Document;
+
+namespace ElectricalToolSuite.FindAndReplace
 {
     class TextFinderBuilder
     {
-        public static TextFinder BuildTextFinder(FinderSettings finderSettings)
+        public static TextFinder BuildTextFinder(FinderSettings finderSettings, Document document)
         {
-            return new TextFinder(finderSettings.SearchText);
-        }
+            //construct whether case sensitive or not
+            var caseSensitive = RegexOptions.None;
+            if (!finderSettings.CaseSensitive)
+            {
+                caseSensitive = RegexOptions.IgnoreCase;
+            }
+            //construct whether whole words matching or not
+            var searchText = finderSettings.SearchText;
+            if (finderSettings.WholeWords)
+            {
+                searchText = @"\b" + searchText + @"\b";
+            }
 
+            return new TextFinder(searchText, caseSensitive, document);
+        }
     }
 }

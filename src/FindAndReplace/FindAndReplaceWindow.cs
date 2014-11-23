@@ -6,7 +6,7 @@ namespace ElectricalToolSuite.FindAndReplace
 {
     public partial class FindAndReplaceWindow : Form
     {
-
+        public bool NotCancelled { set; get; }
         private readonly FinderSettings _finderSettings; 
         public FindAndReplaceWindow()
         {
@@ -62,6 +62,7 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private void FindButton_Click(object sender, EventArgs e)
         {
+            NotCancelled = true;
             Close();
         }
 
@@ -73,6 +74,7 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
+            NotCancelled = false;
             Close();
         }
 
