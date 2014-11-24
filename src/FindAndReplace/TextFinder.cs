@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Media.Media3D;
 using Autodesk.Revit.DB;
 
 namespace ElectricalToolSuite.FindAndReplace
@@ -11,20 +12,40 @@ namespace ElectricalToolSuite.FindAndReplace
     {
         private readonly String _searchText;
         private readonly RegexOptions _compareOptions;
-        public TextFinder(String searchText, RegexOptions compareOptions, Document document)
+        private readonly bool _showHiddenElements;
+        public TextFinder(String searchText, RegexOptions compareOptions,
+            Document document, bool showHiddenElements)
         {
             _searchText = searchText;
             _compareOptions = compareOptions;
+            _showHiddenElements = showHiddenElements;
         }
 
         public List<ResultsDto> FindMatchingElements(FilteredElementCollector allElements,
-            FilteredElementCollector allTextBoxes)
+            FilteredElementCollector allTextBoxes,
+            List<ViewSelectorDto> allViews)
         {
             var matchingElements = new List<ResultsDto>();
-
             foreach (FamilyInstance elem in allElements.Cast<FamilyInstance>())
             {
                 var matchingParamList = new List<MatchingParameterDto>();
+                var elementVisible = false;
+                foreach (ViewSelectorDto view in allViews)
+                {
+                    if (view.IsChecked)
+                    {
+                        if (!elem.IsHidden(view.View))
+                        {
+                            elementVisible = true;
+                        }       
+                    }
+                }
+
+                if (!elementVisible && !_showHiddenElements)
+                {
+                    continue;
+                }
+
                 foreach (Parameter param in elem.Parameters)
                 {
                     if (!String.IsNullOrEmpty(param.AsString())

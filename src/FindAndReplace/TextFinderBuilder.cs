@@ -22,7 +22,7 @@ namespace ElectricalToolSuite.FindAndReplace
                 searchText = @"\b" + searchText + @"\b";
             }
 
-            return new TextFinder(searchText, caseSensitive, document);
+            return new TextFinder(searchText, caseSensitive, document, finderSettings.HiddenElements);
         }
     }
 }

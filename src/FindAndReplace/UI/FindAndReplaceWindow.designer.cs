@@ -35,12 +35,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.WholeWordsCheckBox = new System.Windows.Forms.CheckBox();
             this.ScopeLabel = new System.Windows.Forms.Label();
             this.HiddenElementCheckBox = new System.Windows.Forms.CheckBox();
-            this.DimensionCheckBox = new System.Windows.Forms.CheckBox();
-            this.TableTextCheckBox = new System.Windows.Forms.CheckBox();
-            this.FamilyPropertiesCheckBox = new System.Windows.Forms.CheckBox();
             this.FindButton = new System.Windows.Forms.Button();
-            this.ReplaceButton = new System.Windows.Forms.Button();
-            this.CancelButton = new System.Windows.Forms.Button();
             this.FindTextBox = new System.Windows.Forms.TextBox();
             this.ReplaceTextBox = new System.Windows.Forms.TextBox();
             this.FindLabel = new System.Windows.Forms.Label();
@@ -48,6 +43,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.CurrentViewRadioButton = new System.Windows.Forms.RadioButton();
             this.EntireProjectRadioButton = new System.Windows.Forms.RadioButton();
             this.SelectedViewsRadioButton = new System.Windows.Forms.RadioButton();
+            this.CancelButton = new System.Windows.Forms.Button();
             this.TableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,18 +52,13 @@ namespace ElectricalToolSuite.FindAndReplace
             this.TableLayoutPanel.AutoSize = true;
             this.TableLayoutPanel.ColumnCount = 3;
             this.TableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.TableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 149F));
-            this.TableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 106F));
+            this.TableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 246F));
+            this.TableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 9F));
             this.TableLayoutPanel.Controls.Add(this.CaseSensitiveCheckBox, 0, 2);
             this.TableLayoutPanel.Controls.Add(this.WholeWordsCheckBox, 0, 3);
             this.TableLayoutPanel.Controls.Add(this.ScopeLabel, 0, 4);
             this.TableLayoutPanel.Controls.Add(this.HiddenElementCheckBox, 1, 5);
-            this.TableLayoutPanel.Controls.Add(this.DimensionCheckBox, 1, 7);
-            this.TableLayoutPanel.Controls.Add(this.TableTextCheckBox, 1, 8);
-            this.TableLayoutPanel.Controls.Add(this.FamilyPropertiesCheckBox, 1, 9);
             this.TableLayoutPanel.Controls.Add(this.FindButton, 0, 10);
-            this.TableLayoutPanel.Controls.Add(this.ReplaceButton, 1, 10);
-            this.TableLayoutPanel.Controls.Add(this.CancelButton, 2, 10);
             this.TableLayoutPanel.Controls.Add(this.FindTextBox, 1, 0);
             this.TableLayoutPanel.Controls.Add(this.ReplaceTextBox, 1, 1);
             this.TableLayoutPanel.Controls.Add(this.FindLabel, 0, 0);
@@ -75,6 +66,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.TableLayoutPanel.Controls.Add(this.CurrentViewRadioButton, 0, 5);
             this.TableLayoutPanel.Controls.Add(this.EntireProjectRadioButton, 0, 8);
             this.TableLayoutPanel.Controls.Add(this.SelectedViewsRadioButton, 0, 7);
+            this.TableLayoutPanel.Controls.Add(this.CancelButton, 1, 10);
             this.TableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.TableLayoutPanel.Name = "TableLayoutPanel";
@@ -93,7 +85,6 @@ namespace ElectricalToolSuite.FindAndReplace
             this.TableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 14F));
             this.TableLayoutPanel.Size = new System.Drawing.Size(394, 296);
             this.TableLayoutPanel.TabIndex = 0;
-            this.TableLayoutPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
             // CaseSensitiveCheckBox
             // 
@@ -137,39 +128,6 @@ namespace ElectricalToolSuite.FindAndReplace
             this.HiddenElementCheckBox.UseVisualStyleBackColor = true;
             this.HiddenElementCheckBox.CheckedChanged += new System.EventHandler(this.HiddenElementCheckBox_CheckedChanged);
             // 
-            // DimensionCheckBox
-            // 
-            this.DimensionCheckBox.AutoSize = true;
-            this.DimensionCheckBox.Location = new System.Drawing.Point(142, 145);
-            this.DimensionCheckBox.Name = "DimensionCheckBox";
-            this.DimensionCheckBox.Size = new System.Drawing.Size(131, 17);
-            this.DimensionCheckBox.TabIndex = 10;
-            this.DimensionCheckBox.Text = "Include dimension text";
-            this.DimensionCheckBox.UseVisualStyleBackColor = true;
-            this.DimensionCheckBox.CheckedChanged += new System.EventHandler(this.DimensionCheckBox_CheckedChanged);
-            // 
-            // TableTextCheckBox
-            // 
-            this.TableTextCheckBox.AutoSize = true;
-            this.TableTextCheckBox.Location = new System.Drawing.Point(142, 169);
-            this.TableTextCheckBox.Name = "TableTextCheckBox";
-            this.TableTextCheckBox.Size = new System.Drawing.Size(107, 17);
-            this.TableTextCheckBox.TabIndex = 11;
-            this.TableTextCheckBox.Text = "Include table text";
-            this.TableTextCheckBox.UseVisualStyleBackColor = true;
-            this.TableTextCheckBox.CheckedChanged += new System.EventHandler(this.TableTextCheckBox_CheckedChanged);
-            // 
-            // FamilyPropertiesCheckBox
-            // 
-            this.FamilyPropertiesCheckBox.AutoSize = true;
-            this.FamilyPropertiesCheckBox.Location = new System.Drawing.Point(142, 195);
-            this.FamilyPropertiesCheckBox.Name = "FamilyPropertiesCheckBox";
-            this.FamilyPropertiesCheckBox.Size = new System.Drawing.Size(139, 17);
-            this.FamilyPropertiesCheckBox.TabIndex = 12;
-            this.FamilyPropertiesCheckBox.Text = "Include family properties";
-            this.FamilyPropertiesCheckBox.UseVisualStyleBackColor = true;
-            this.FamilyPropertiesCheckBox.CheckedChanged += new System.EventHandler(this.FamilyPropertiesCheckBox_CheckedChanged);
-            // 
             // FindButton
             // 
             this.FindButton.Location = new System.Drawing.Point(3, 223);
@@ -180,31 +138,11 @@ namespace ElectricalToolSuite.FindAndReplace
             this.FindButton.UseVisualStyleBackColor = true;
             this.FindButton.Click += new System.EventHandler(this.FindButton_Click);
             // 
-            // ReplaceButton
-            // 
-            this.ReplaceButton.Location = new System.Drawing.Point(142, 223);
-            this.ReplaceButton.Name = "ReplaceButton";
-            this.ReplaceButton.Size = new System.Drawing.Size(75, 23);
-            this.ReplaceButton.TabIndex = 14;
-            this.ReplaceButton.Text = "Replace";
-            this.ReplaceButton.UseVisualStyleBackColor = true;
-            this.ReplaceButton.Click += new System.EventHandler(this.ReplaceButton_Click);
-            // 
-            // CancelButton
-            // 
-            this.CancelButton.Location = new System.Drawing.Point(291, 223);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 15;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
-            // 
             // FindTextBox
             // 
             this.FindTextBox.Location = new System.Drawing.Point(142, 3);
             this.FindTextBox.Name = "FindTextBox";
-            this.FindTextBox.Size = new System.Drawing.Size(100, 20);
+            this.FindTextBox.Size = new System.Drawing.Size(223, 20);
             this.FindTextBox.TabIndex = 0;
             this.FindTextBox.TextChanged += new System.EventHandler(this.FindTextBox_TextChanged);
             // 
@@ -212,7 +150,7 @@ namespace ElectricalToolSuite.FindAndReplace
             // 
             this.ReplaceTextBox.Location = new System.Drawing.Point(142, 29);
             this.ReplaceTextBox.Name = "ReplaceTextBox";
-            this.ReplaceTextBox.Size = new System.Drawing.Size(100, 20);
+            this.ReplaceTextBox.Size = new System.Drawing.Size(223, 20);
             this.ReplaceTextBox.TabIndex = 1;
             this.ReplaceTextBox.TextChanged += new System.EventHandler(this.ReplaceTextBox_TextChanged);
             // 
@@ -269,6 +207,16 @@ namespace ElectricalToolSuite.FindAndReplace
             this.SelectedViewsRadioButton.UseVisualStyleBackColor = true;
             this.SelectedViewsRadioButton.CheckedChanged += new System.EventHandler(this.SelectedViewsRadioButton_CheckedChanged);
             // 
+            // CancelButton
+            // 
+            this.CancelButton.Location = new System.Drawing.Point(142, 223);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(75, 23);
+            this.CancelButton.TabIndex = 15;
+            this.CancelButton.Text = "Cancel";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            // 
             // FindAndReplaceWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -279,7 +227,6 @@ namespace ElectricalToolSuite.FindAndReplace
             this.MinimizeBox = false;
             this.Name = "FindAndReplaceWindow";
             this.Text = "Find and Replace";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.TableLayoutPanel.ResumeLayout(false);
             this.TableLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -299,11 +246,7 @@ namespace ElectricalToolSuite.FindAndReplace
         private System.Windows.Forms.RadioButton EntireProjectRadioButton;
         private System.Windows.Forms.Label ScopeLabel;
         private System.Windows.Forms.CheckBox HiddenElementCheckBox;
-        private System.Windows.Forms.CheckBox DimensionCheckBox;
-        private System.Windows.Forms.CheckBox TableTextCheckBox;
-        private System.Windows.Forms.CheckBox FamilyPropertiesCheckBox;
         private System.Windows.Forms.Button FindButton;
-        private System.Windows.Forms.Button ReplaceButton;
         private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Label FindLabel;
         private System.Windows.Forms.Label ReplaceLabel;

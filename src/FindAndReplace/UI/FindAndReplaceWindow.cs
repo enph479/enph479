@@ -1,17 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Forms;
+using System.Linq;
+using System.Windows.Documents;
+using Autodesk.Revit.DB;
+using ElectricalToolSuite.FindAndReplace.UI;
+using Form = System.Windows.Forms.Form;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
     public partial class FindAndReplaceWindow : Form
     {
         public bool NotCancelled { set; get; }
-        private readonly FinderSettings _finderSettings; 
-        public FindAndReplaceWindow()
+        private readonly FinderSettings _finderSettings;
+        private List<ViewSelectorDto> _searchableViews;
+        public FindAndReplaceWindow(FilteredElementCollector allViews, View activeView)
         {
             InitializeComponent();
             _finderSettings = new FinderSettings();
+            _searchableViews = new List<ViewSelectorDto>();
+
+            foreach (View view in allViews.OfType<View>())
+            {
+                Debug.Write(activeView.Id);
+                Debug.WriteLine(view.Id);
+                _searchableViews.Add(view.Id.Equals(activeView.Id)
+                    ? new ViewSelectorDto(true, view)
+                    : new ViewSelectorDto(false, view));
+            }
         }
 
         private void FindTextBox_TextChanged(object sender, EventArgs e)
@@ -31,8 +47,12 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private void SelectedViewsRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings.SearchViewFilter = SearchViewSettings.SelectedView;
-            //TODO: for selected views make it so a new dialog box appears to selected the selected views 
+            if (SelectedViewsRadioButton.Checked)
+            {
+                _finderSettings.SearchViewFilter = SearchViewSettings.SelectedView;
+                var temp = new SelectedViewResults(_searchableViews);
+                temp.Show();
+            }
         }
 
         private void WholeWordsCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -45,30 +65,9 @@ namespace ElectricalToolSuite.FindAndReplace
             _finderSettings.HiddenElements = HiddenElementCheckBox.Checked;
         }
 
-        private void DimensionCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            _finderSettings.DimensionText = DimensionCheckBox.Checked;
-        }
-
-        private void TableTextCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            _finderSettings.IncludeTableText = TableTextCheckBox.Checked;
-        }
-
-        private void FamilyPropertiesCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            _finderSettings.FamilyProperties = FamilyPropertiesCheckBox.Checked;
-        }
-
         private void FindButton_Click(object sender, EventArgs e)
         {
             NotCancelled = true;
-            Close();
-        }
-
-        private void ReplaceButton_Click(object sender, EventArgs e)
-        {
-            //TODO: Actually implement replace functionality
             Close();
         }
 
@@ -80,25 +79,40 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private void CurrentViewRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings.SearchViewFilter = SearchViewSettings.CurrentView;
+            if (CurrentViewRadioButton.Checked)
+            {
+                _finderSettings.SearchViewFilter = SearchViewSettings.CurrentView;                
+            }
         }
 
         private void EntireProjectRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _finderSettings.SearchViewFilter = SearchViewSettings.AllViews;
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
+            if (EntireProjectRadioButton.Checked)
+            {
+                _finderSettings.SearchViewFilter = SearchViewSettings.AllViews;
+                foreach (ViewSelectorDto view in _searchableViews)
+                {
+                    view.IsChecked = true;
+                }
+            }
         }
 
         public FinderSettings GetFinderSettings()
         {
             return _finderSettings;
         }
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-        }
 
+        public List<ViewSelectorDto> GetSearchableViews()
+        {
+            var removeList = new List<ViewSelectorDto>(_searchableViews);
+            foreach (ViewSelectorDto view in removeList)
+            {
+                if (!view.IsChecked)
+                {
+                    _searchableViews.Remove(view);
+                }
+            }
+            return _searchableViews;
+        }
     }
 }

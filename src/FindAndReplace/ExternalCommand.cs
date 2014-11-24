@@ -12,7 +12,13 @@ namespace ElectricalToolSuite.FindAndReplace
         public Result Execute(ExternalCommandData commandData,
                 ref string message, ElementSet elements)
         {
-            var findForm = new FindAndReplaceWindow();
+            var uiDocument = commandData.Application.ActiveUIDocument;
+            var document = uiDocument.Document;
+
+            var viewCollector = new FilteredElementCollector(document);
+            var allViews = viewCollector.OfClass(typeof(View));
+
+            var findForm = new FindAndReplaceWindow(allViews, document.ActiveView);
             findForm.ShowDialog();
             if (findForm.NotCancelled)
             {
@@ -20,9 +26,6 @@ namespace ElectricalToolSuite.FindAndReplace
                 //var dPid = new DockablePaneId(DockConstants.Id);
                 //var pane = commandData.Application.GetDockablePane(dPid);
                 //pane.Show();
-                
-                var uiDocument = commandData.Application.ActiveUIDocument;
-                var document = uiDocument.Document;
                 
                 var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings(), document);
 
@@ -32,15 +35,18 @@ namespace ElectricalToolSuite.FindAndReplace
                 var allFamilies = elementCollector.OfClass(typeof (FamilyInstance));
                 var allTextBoxes = textCollector.OfClass(typeof (TextElement));
 
-                var matchingElements = textFinder.FindMatchingElements(allFamilies, allTextBoxes);
+                var matchingElements = textFinder.FindMatchingElements(allFamilies, allTextBoxes, findForm.GetSearchableViews());
 
                 var resultsForm = new DebugFindResult();
                 resultsForm.UpdateElements(matchingElements);
                 resultsForm.ShowDialog();
-                //Globals.MatchingElementSet = matchingElements;     
+                //Globals.MatchingElementSet = matchingElements;   
+  
+
+                //Changing the views and stuff
                 View currentView = uiDocument.ActiveView;
                 UIView uiview = null;
-                IList<UIView> uiviews = uiDocument.GetOpenUIViews();
+                IList<UIView> uiviews = uiDocument.GetOpenUIViews(); //this is dumb but is the way thebuildingcoder does it
 
                 foreach (UIView uv in uiviews)
                 {
@@ -48,9 +54,12 @@ namespace ElectricalToolSuite.FindAndReplace
                     uiview = uv;
                     break;
                 }
-                var elem = document.GetElement(Globals.SelectedElement);
-                var boundingbox = elem.get_BoundingBox(uiDocument.ActiveView);
-                uiview.ZoomAndCenterRectangle(boundingbox.get_Bounds(0), boundingbox.get_Bounds(1));
+                if (Globals.SelectedElement != null)
+                {
+                    var elem = document.GetElement(Globals.SelectedElement);
+                    var boundingbox = elem.get_BoundingBox(uiDocument.ActiveView);
+                    uiview.ZoomAndCenterRectangle(boundingbox.get_Bounds(0), boundingbox.get_Bounds(1));
+                }
 
             }
             return Result.Succeeded;

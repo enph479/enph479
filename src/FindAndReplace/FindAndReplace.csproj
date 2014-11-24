@@ -101,6 +101,10 @@
     <Compile Include="UI\DockPage.xaml.cs">
       <DependentUpon>DockPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SelectedViewResults.xaml.cs">
+      <DependentUpon>SelectedViewResults.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSelectorDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\FindAndReplaceWindow.resx">
@@ -119,6 +123,10 @@
     <Page Include="UI\DockPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SelectedViewResults.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
