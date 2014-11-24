@@ -73,20 +73,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationCommand.cs" />
+    <Compile Include="MatchingParameterDto.cs" />
+    <Compile Include="ResultsDto.cs" />
     <Compile Include="CommandConstants.cs" />
     <Compile Include="DockConstants.cs" />
+    <Compile Include="DockExtensions.cs" />
     <Compile Include="ExternalCommand.cs" />
-    <Compile Include="FindAndReplaceWindow.cs">
+    <Compile Include="UI\FindAndReplaceWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FindAndReplaceWindow.designer.cs">
+    <Compile Include="UI\FindAndReplaceWindow.designer.cs">
       <DependentUpon>FindAndReplaceWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="FinderSettings.cs" />
-    <Compile Include="DebugFindResults.xaml.cs">
+    <Compile Include="UI\DebugFindResults.xaml.cs">
       <DependentUpon>DebugFindResults.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FindResultsWindow.xaml.cs">
+    <Compile Include="UI\FindResultsWindow.xaml.cs">
       <DependentUpon>FindResultsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Globals.cs" />
@@ -100,16 +103,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FindAndReplaceWindow.resx">
+    <EmbeddedResource Include="UI\FindAndReplaceWindow.resx">
       <DependentUpon>FindAndReplaceWindow.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DebugFindResults.xaml">
+    <Page Include="UI\DebugFindResults.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="FindResultsWindow.xaml">
+    <Page Include="UI\FindResultsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -117,12 +120,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Redbolts.UI.Common\Redbolts.UI.Common.csproj">
-      <Project>{3A508B74-07D4-4240-A2A6-22486FFC1A2F}</Project>
-      <Name>Redbolts.UI.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

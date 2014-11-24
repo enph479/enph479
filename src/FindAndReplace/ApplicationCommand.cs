@@ -64,7 +64,9 @@ namespace ElectricalToolSuite.FindAndReplace
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 uidoc.Selection.SetElementIds(new Collection<ElementId> {Globals.SelectedElement});
-                
+                var document = uidoc.Document;
+                var selectedElement = document.GetElement(Globals.SelectedElement);
+                selectedElement.get_BoundingBox(uidoc.ActiveView);
                 Globals.SelectedElement = null;
             }
         }

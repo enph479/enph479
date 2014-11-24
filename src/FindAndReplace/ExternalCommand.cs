@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.Attributes;
+﻿using System.Collections.Generic;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Linq;
@@ -19,22 +20,38 @@ namespace ElectricalToolSuite.FindAndReplace
                 //var dPid = new DockablePaneId(DockConstants.Id);
                 //var pane = commandData.Application.GetDockablePane(dPid);
                 //pane.Show();
-
+                
                 var uiDocument = commandData.Application.ActiveUIDocument;
                 var document = uiDocument.Document;
-
+                
                 var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings(), document);
 
-                var collector = new FilteredElementCollector(document);
+                var elementCollector = new FilteredElementCollector(document);
+                var textCollector = new FilteredElementCollector(document);
 
-                var allElements = collector.OfClass(typeof (TextElement));
-                var debugging = allElements.OfType<AnnotationSymbol>();
-                var matchingElements = textFinder.FindMatchingElements(allElements);
+                var allFamilies = elementCollector.OfClass(typeof (FamilyInstance));
+                var allTextBoxes = textCollector.OfClass(typeof (TextElement));
+
+                var matchingElements = textFinder.FindMatchingElements(allFamilies, allTextBoxes);
 
                 var resultsForm = new DebugFindResult();
                 resultsForm.UpdateElements(matchingElements);
                 resultsForm.ShowDialog();
-                Globals.MatchingElementSet = matchingElements;                
+                //Globals.MatchingElementSet = matchingElements;     
+                View currentView = uiDocument.ActiveView;
+                UIView uiview = null;
+                IList<UIView> uiviews = uiDocument.GetOpenUIViews();
+
+                foreach (UIView uv in uiviews)
+                {
+                    if (!uv.ViewId.Equals(currentView.Id)) continue;
+                    uiview = uv;
+                    break;
+                }
+                var elem = document.GetElement(Globals.SelectedElement);
+                var boundingbox = elem.get_BoundingBox(uiDocument.ActiveView);
+                uiview.ZoomAndCenterRectangle(boundingbox.get_Bounds(0), boundingbox.get_Bounds(1));
+
             }
             return Result.Succeeded;
         }
