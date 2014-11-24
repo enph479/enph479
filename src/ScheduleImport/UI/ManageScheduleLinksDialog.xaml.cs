@@ -1,12 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Electrical;
-using Autodesk.Revit.UI;
 
 namespace ElectricalToolSuite.ScheduleImport.UI
 {
@@ -16,14 +12,12 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     public partial class ManageScheduleLinksDialog
     {
         private readonly Document _document;
-        private readonly UIDocument _uiDocument;
 
         public bool PressedCreate { get; private set; }
 
-        public ManageScheduleLinksDialog(Document document, UIDocument uiDocument)
+        public ManageScheduleLinksDialog(Document document)
         {
             _document = document;
-            _uiDocument = uiDocument;
             InitializeComponent();
         }
 
@@ -33,7 +27,6 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             if (hasSelection)
             {
-                //                ReloadButton.IsEnabled = true;
                 EditButton.IsEnabled = true;
                 RemoveButton.IsEnabled = true;
                 ReloadButton.IsEnabled =
@@ -66,14 +59,6 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             var selectedLink = (ManagedScheduleLink) ManagedScheduleLinksDataGrid.SelectedItem;
 
             selectedLink.Reload();
-
-//            var schedule = selectedLink.GetSchedule();
-//            var workbookPath = selectedLink.WorkbookPath;
-//            var worksheetName = selectedLink.WorksheetName;
-//
-//            Cursor = Cursors.Wait;
-//            ExternalCommand.ImportSchedule(schedule, workbookPath, worksheetName);
-//            Cursor = Cursors.Arrow;
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
@@ -87,30 +72,23 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             using (var excelApplication = new NetOffice.ExcelApi.Application { DisplayAlerts = false })
             {
-                var wnd = new SheetSelectionDialog(excelApplication, _document);
+                var wnd = new SheetSelectionDialog(excelApplication, _document, selectedLink.GetSchedule());
 
                 wnd.ScheduleNameTextBox.Text = selectedLink.ScheduleName;
                 wnd.ScheduleTypeTextBox.Text = selectedLink.ScheduleType;
-
                 wnd.FilePathTextBox.Text = selectedLink.WorkbookPath;
-
+                
                 wnd.OkButton.Content = "Save";
-
-                wnd.ValidName = selectedLink.ScheduleName;
-
-//                wnd.ScheduleNameTextBox.IsEnabled = false;
-//                wnd.ScheduleTypeTextBox.IsEnabled = false;
 
                 wnd.Title = "Edit Excel Schedule Link";
 
-                    if (wnd.ShowDialog() != true)
-                        return;
+                if (wnd.ShowDialog() != true)
+                    return;
 
-                    workbookPath = wnd.FilePathTextBox.Text;
-                    worksheetName = (string)wnd.SheetComboBox.SelectedItem;
-                    scheduleName = wnd.ScheduleNameTextBox.Text;
-                    scheduleType = wnd.ScheduleTypeTextBox.Text;
-
+                workbookPath = wnd.FilePathTextBox.Text;
+                worksheetName = (string)wnd.SheetComboBox.SelectedItem;
+                scheduleName = wnd.ScheduleNameTextBox.Text;
+                scheduleType = wnd.ScheduleTypeTextBox.Text;
 
                 excelApplication.Quit();
             }
@@ -133,13 +111,8 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             LinkGateway.DeleteLink(schedule);
             _document.Delete(schedule.Id);
-
-//            var schema = ExternalCommand.GetSchema();
-//            Debug.Assert(schedule.DeleteEntity(schema));
-
-//            Cursor = Cursors.Wait;
+            
             ManagedScheduleLinksDataGrid.ItemsSource = ExternalCommand.GetManagedSchedules(_document);
-//            Cursor = Cursors.Arrow;
 
             ManagedScheduleLinksDataGrid.Items.Refresh();
             UpdateButtons();
@@ -160,13 +133,6 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             PressedCreate = true;
             DialogResult = true;
             UpdateButtons();
-//            Visibility = System.Windows.Visibility.Collapsed;
-//
-//            var selectedPanel = new ElementSelector(_uiDocument).SelectSingle() as FamilyInstance;
-//
-//            Debug.Assert(selectedPanel != null);
-//
-//            Visibility = System.Windows.Visibility.Visible;
         }
 
         private void ReloadAllButton_Click(object sender, RoutedEventArgs e)

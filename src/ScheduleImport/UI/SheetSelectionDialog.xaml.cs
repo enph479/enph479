@@ -18,14 +18,15 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     public partial class SheetSelectionDialog
     {
         public bool HasValidExcelFile { get; set; }
-        public string ValidName { get; set; }
         private readonly Excel.Application _excelApplication;
-        private readonly Autodesk.Revit.DB.Document _document;
+        private readonly Document _document;
+        private readonly PanelScheduleView _schedule;
 
-        public SheetSelectionDialog(Excel.Application excelApplication, Autodesk.Revit.DB.Document doc)
+        public SheetSelectionDialog(Excel.Application excelApplication, Document doc, PanelScheduleView schedule)
         {
             _excelApplication = excelApplication;
             _document = doc;
+            _schedule = schedule;
 
             HasValidExcelFile = false;
             InitializeComponent();
@@ -38,23 +39,25 @@ namespace ElectricalToolSuite.ScheduleImport.UI
         {
             var scheduleName = ScheduleNameTextBox.Text;
 
-            if (DialogResult == true && ValidName != null && scheduleName != ValidName)
-            {
-                var existingSchedule =
-                    new FilteredElementCollector(_document).OfClass(typeof (PanelScheduleView))
-                        .Cast<PanelScheduleView>().Any(s => s.Name == scheduleName);
+            if (DialogResult == false)
+                return;
 
-                if (existingSchedule)
-                {
-                    var dlg = new TaskDialog("Cannot rename schedule");
-                    dlg.MainInstruction = String.Format("There is already a panel schedule with name '{0}.'",
-                        scheduleName);
-                    dlg.MainIcon = TaskDialogIcon.TaskDialogIconWarning;
-                    dlg.Show();
-                    e.Cancel = true;
-                    Focus();
-                }
-            }
+            if (_schedule != null && scheduleName == _schedule.Name)
+                return;
+
+            var existingSchedule =
+                new FilteredElementCollector(_document).OfClass(typeof (PanelScheduleView))
+                    .Cast<PanelScheduleView>()
+                    .Any(s => s.Name == scheduleName);
+
+            if (!existingSchedule)
+                return;
+
+            TaskDialog.Show("Cannot rename schedule",
+                String.Format("There is already a panel schedule with name '{0}.'", scheduleName));
+
+            e.Cancel = true;
+            Focus();
         }
 
         void FilePathTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -65,7 +68,6 @@ namespace ElectricalToolSuite.ScheduleImport.UI
                 SheetComboBox.IsEnabled = true;
                 OpenWorkbookButton.IsEnabled = true;
 
-                // TODO This is probably way too slow to put here
                 using (var workbook = _excelApplication.Workbooks.Open(FilePathTextBox.Text, false, true))
                 {
                     var worksheets = workbook.Worksheets.Cast<Excel.Worksheet>().Select(s => s.Name).ToList();

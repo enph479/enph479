@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
-using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 using System;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
@@ -24,22 +23,10 @@ namespace ElectricalToolSuite.ScheduleImport
         {
             var uiDoc = commandData.Application.ActiveUIDocument;
             var doc = uiDoc.Document;
-            
-//            var selectedPanelRef = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
-
-//            var selectedPanel = doc.GetElement(selectedPanelRef) as FamilyInstance;
-
-//            Result result;
-//            CreateLink(uiDoc, doc, out result);
-//            if (result == Result.Cancelled)
-//                return result;
-
-            // TODO Put this back in
-//            uiDoc.ActiveView = schedule;
 
             while (true)
             {
-                var mgWnd = new ManageScheduleLinksDialog(doc, uiDoc);
+                var mgWnd = new ManageScheduleLinksDialog(doc);
                 var managedSchedules = GetManagedSchedules(doc);
                 mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
                 mgWnd.UpdateButtons();
@@ -66,38 +53,9 @@ namespace ElectricalToolSuite.ScheduleImport
             {
                 TaskDialog.Show("Invalid selection", "Please select a panel.");
                 {
-//                    cancelled = Result.Cancelled;
                     return;
                 }
             }
-
-//            var existingSchedule =
-//                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
-//                    .Cast<PanelScheduleView>()
-//                    .Where(s => s.GetPanel() == selectedPanel.Id)
-//                    .Take(1)
-//                    .ToList();
-//
-//            PanelScheduleView schedule;
-//
-//            if (existingSchedule.Any())
-//            {
-//                var confirmOperation = TaskDialog.Show("Overwrite existing schedule",
-//                    "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
-//                    TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
-//                if (confirmOperation == TaskDialogResult.Cancel)
-//                {
-////                    cancelled = Result.Cancelled;
-//                    return;
-//                }
-//
-//                schedule = existingSchedule.First();
-//            }
-//            else
-//            {
-//                schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
-//                schedule.ViewName = selectedPanel.Name;
-//            }
 
             string workbookPath;
             string worksheetName;
@@ -106,13 +64,12 @@ namespace ElectricalToolSuite.ScheduleImport
 
             using (var excelApplication = new Excel.Application {DisplayAlerts = false})
             {
-                var wnd = new SheetSelectionDialog(excelApplication, doc);
+                var wnd = new SheetSelectionDialog(excelApplication, doc, null);
 
                 wnd.ScheduleNameTextBox.Text = selectedPanel.Name;
 
                 if (wnd.ShowDialog() != true)
                 {
-//                    cancelled = Result.Cancelled;
                     return;
                 }
 

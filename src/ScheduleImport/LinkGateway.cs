@@ -22,8 +22,7 @@ namespace ElectricalToolSuite.ScheduleImport
             var schemaBuilder = new SchemaBuilder(SchemaGuid);
 
             schemaBuilder.SetReadAccessLevel(AccessLevel.Public);
-            schemaBuilder.SetWriteAccessLevel(AccessLevel.Public); // TODO
-            //            schemaBuilder.SetVendorId("ENPH 479");
+            schemaBuilder.SetWriteAccessLevel(AccessLevel.Public);
             schemaBuilder.SetSchemaName(SchemaName);
 
             var fieldBuilder = schemaBuilder.AddSimpleField(WorkbookPathKey, typeof(string));
