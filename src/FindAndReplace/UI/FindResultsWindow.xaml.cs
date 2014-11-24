@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
 
@@ -13,12 +14,9 @@ namespace ElectricalToolSuite.FindAndReplace
         public FindResultsWindow()
         {
             InitializeComponent();
-            var temp = new ElementSet();
-            temp.Insert(null);
-            UpdateElements(temp);
         }
 
-        public void UpdateElements(ElementSet elements)
+        public void UpdateElements(List<ResultsDto> elements)
         {
             ListOfMatchingElements.ItemsSource = elements;
         }
@@ -26,7 +24,7 @@ namespace ElectricalToolSuite.FindAndReplace
         private void GetSelectedElementFromResults(object sender, RoutedEventArgs e)
         {
             var castedSender = ((ListBox) sender);
-            Globals.SelectedElement = ((Element)castedSender.SelectedItem).Id;
+            Globals.SelectedElement = ((ResultsDto)castedSender.SelectedItem).MatchingElement.Id;
         } 
     }
 }

@@ -14,8 +14,44 @@
         <ListView HorizontalAlignment="Left" Height="auto" Margin="0,0,0,0" VerticalAlignment="Top" Width="auto" x:Name="ListOfMatchingElements" MouseDoubleClick="GetSelectedElementFromResults">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="150" Header="Family Name" DisplayMemberBinding ="{Binding Path=Symbol.Family.Name}"/>
-                    <GridViewColumn Width="150" Header="Family Type" DisplayMemberBinding ="{Binding Path=Symbol.Name}"/>         
+                    <GridViewColumn Width="150" Header="Family Name" DisplayMemberBinding ="{Binding Path=MatchingElement.Symbol.Family.Name}"/>
+                    <GridViewColumn Width="150" Header="Family Type" DisplayMemberBinding ="{Binding Path=MatchingElement.Symbol.Name}"/>
+                    <GridViewColumn Header="Parameter Name(s)">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ItemsControl ItemsSource="{Binding MatchingParameters}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Parameter Value(s)">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ItemsControl ItemsSource="{Binding MatchingParameters}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Value}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

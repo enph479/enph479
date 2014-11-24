@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -67,6 +68,24 @@ namespace ElectricalToolSuite.FindAndReplace
                 var document = uidoc.Document;
                 var selectedElement = document.GetElement(Globals.SelectedElement);
                 selectedElement.get_BoundingBox(uidoc.ActiveView);
+
+                //Changing the views and stuff
+                View currentView = uidoc.ActiveView;
+                UIView uiview = null;
+                IList<UIView> uiviews = uidoc.GetOpenUIViews(); //this is dumb but is the way thebuildingcoder does it
+
+                foreach (UIView uv in uiviews)
+                {
+                    if (!uv.ViewId.Equals(currentView.Id)) continue;
+                    uiview = uv;
+                    break;
+                }
+                if (Globals.SelectedElement != null && uiview != null)
+                {
+                    var elem = document.GetElement(Globals.SelectedElement);
+                    var boundingbox = elem.get_BoundingBox(uidoc.ActiveView);
+                    uiview.ZoomAndCenterRectangle(boundingbox.get_Bounds(0), boundingbox.get_Bounds(1));
+                }
                 Globals.SelectedElement = null;
             }
         }

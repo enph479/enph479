@@ -23,9 +23,9 @@ namespace ElectricalToolSuite.FindAndReplace
             if (findForm.NotCancelled)
             {
                 //force show the dockable pane on search
-                //var dPid = new DockablePaneId(DockConstants.Id);
-                //var pane = commandData.Application.GetDockablePane(dPid);
-                //pane.Show();
+                var dPid = new DockablePaneId(DockConstants.Id);
+                var pane = commandData.Application.GetDockablePane(dPid);
+                pane.Show();
                 
                 var textFinder = TextFinderBuilder.BuildTextFinder(findForm.GetFinderSettings(), document);
 
@@ -37,29 +37,7 @@ namespace ElectricalToolSuite.FindAndReplace
 
                 var matchingElements = textFinder.FindMatchingElements(allFamilies, allTextBoxes, findForm.GetSearchableViews());
 
-                var resultsForm = new DebugFindResult();
-                resultsForm.UpdateElements(matchingElements);
-                resultsForm.ShowDialog();
-                //Globals.MatchingElementSet = matchingElements;   
-  
-
-                //Changing the views and stuff
-                View currentView = uiDocument.ActiveView;
-                UIView uiview = null;
-                IList<UIView> uiviews = uiDocument.GetOpenUIViews(); //this is dumb but is the way thebuildingcoder does it
-
-                foreach (UIView uv in uiviews)
-                {
-                    if (!uv.ViewId.Equals(currentView.Id)) continue;
-                    uiview = uv;
-                    break;
-                }
-                if (Globals.SelectedElement != null)
-                {
-                    var elem = document.GetElement(Globals.SelectedElement);
-                    var boundingbox = elem.get_BoundingBox(uiDocument.ActiveView);
-                    uiview.ZoomAndCenterRectangle(boundingbox.get_Bounds(0), boundingbox.get_Bounds(1));
-                }
+                Globals.MatchingElementSet = matchingElements;   
 
             }
             return Result.Succeeded;
