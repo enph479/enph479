@@ -20,10 +20,8 @@ namespace ElectricalToolSuite.FindAndReplace
             _finderSettings = new FinderSettings();
             _searchableViews = new List<ViewSelectorDto>();
 
-            foreach (View view in allViews.OfType<View>())
+            foreach (View view in allViews.OfType<ViewPlan>())
             {
-                Debug.Write(activeView.Id);
-                Debug.WriteLine(view.Id);
                 _searchableViews.Add(view.Id.Equals(activeView.Id)
                     ? new ViewSelectorDto(true, view)
                     : new ViewSelectorDto(false, view));
