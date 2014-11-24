@@ -4,17 +4,19 @@ using System.Runtime.CompilerServices;
 using Autodesk.Revit.DB.Electrical;
 using System;
 using ElectricalToolSuite.ScheduleImport.Annotations;
+using Revit = Autodesk.Revit.Exceptions;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
-    public class ManagedScheduleLink : INotifyPropertyChanged
+    public class ManagedScheduleLink : INotifyPropertyChanged, IDataErrorInfo
     {
-        private PanelScheduleView _schedule;
+        private readonly PanelScheduleView _schedule;
+        private string _temporaryName;
 
         public ManagedScheduleLink(PanelScheduleView schedule)
         {
             if (!LinkGateway.IsLinked(schedule))
-                throw new ArgumentException("Schedule is not linked to an Excel sheet", "schedule");
+                LinkGateway.CreateLink(schedule, "", "", "");
 
             _schedule = schedule;
         }
@@ -23,12 +25,24 @@ namespace ElectricalToolSuite.ScheduleImport
         {
             get
             {
+                if (Error != "")
+                    return _temporaryName;
                 return _schedule.ViewName; 
             }
             set
             {
-                _schedule.ViewName = value;
-                OnPropertyChanged("ScheduleName");
+                try
+                {
+                    _schedule.ViewName = value;
+                    OnPropertyChanged("ScheduleName");
+                }
+                catch (Revit.ArgumentException)
+                {
+                    Error = "There is already a schedule with this name.";
+                    _temporaryName = value;
+                    return;
+                }
+                Error = "";
             }
         }
 
@@ -49,6 +63,8 @@ namespace ElectricalToolSuite.ScheduleImport
             {
                 LinkGateway.SetWorkbookPath(_schedule, value);
                 OnPropertyChanged("WorkbookPath");
+                OnPropertyChanged("WorkbookExists");
+                OnPropertyChanged("StatusText");
             }
         }
 
@@ -96,5 +112,12 @@ namespace ElectricalToolSuite.ScheduleImport
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public string this[string columnName]
+        {
+            get { return Error; }
+        }
+
+        public string Error { get; private set; }
     }
 }

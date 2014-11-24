@@ -58,38 +58,46 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
         private void Edit(ManagedScheduleLink link)
         {
-            string workbookPath;
-            string worksheetName;
-            string scheduleName;
-            string scheduleType;
-            
-            using (var excelApplication = new NetOffice.ExcelApi.Application { DisplayAlerts = false })
+            using (var trans = new SubTransaction(Document))
             {
-                var wnd = new SheetSelectionDialog(excelApplication, Document, link.GetSchedule());
+                trans.Start();
 
-                wnd.ScheduleNameTextBox.Text = link.ScheduleName;
-                wnd.ScheduleTypeTextBox.Text = link.ScheduleType;
-                wnd.FilePathTextBox.Text = link.WorkbookPath;
-                            
-                wnd.OkButton.Content = "Save";
-                wnd.Title = "Edit Excel Schedule Link";
-            
-                if (wnd.ShowDialog() != true)
-                    return;
-            
-                workbookPath = wnd.FilePathTextBox.Text;
-                worksheetName = (string) wnd.SheetComboBox.SelectedItem;
-                scheduleName = wnd.ScheduleNameTextBox.Text;
-                scheduleType = wnd.ScheduleTypeTextBox.Text;
-            
-                excelApplication.Quit();
+                string workbookPath;
+                string worksheetName;
+                string scheduleName;
+                string scheduleType;
+
+                using (var excelApplication = new NetOffice.ExcelApi.Application {DisplayAlerts = false})
+                {
+                    var vm = new LinkConfigurationViewModel(Document, excelApplication, link);
+                    var wnd = new LinkConfigurationDialog(vm);
+
+                    wnd.ScheduleNameTextBox.Text = link.ScheduleName;
+                    wnd.ScheduleTypeTextBox.Text = link.ScheduleType;
+                    wnd.FilePathTextBox.Text = link.WorkbookPath;
+
+                    wnd.OkButton.Content = "Save";
+                    wnd.Title = "Edit Excel Schedule Link";
+
+                    if (wnd.ShowDialog() != true)
+                        return;
+
+                    workbookPath = wnd.FilePathTextBox.Text;
+                    worksheetName = (string) wnd.SheetComboBox.SelectedItem;
+                    scheduleName = wnd.ScheduleNameTextBox.Text;
+                    scheduleType = wnd.ScheduleTypeTextBox.Text;
+
+                    excelApplication.Quit();
+                }
+
+                link.WorkbookPath = workbookPath;
+                link.WorksheetName = worksheetName;
+                link.ScheduleName = scheduleName;
+                link.ScheduleType = scheduleType;
+                link.Reload();
+
+                trans.Commit();
             }
-
-            link.WorkbookPath = workbookPath;
-            link.WorksheetName = worksheetName;
-            link.ScheduleName = scheduleName;
-            link.ScheduleType = scheduleType;
-            link.Reload();
         }
 
         private void Remove(ManagedScheduleLink link)

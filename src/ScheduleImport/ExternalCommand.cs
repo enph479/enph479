@@ -29,7 +29,7 @@ namespace ElectricalToolSuite.ScheduleImport
                 var managedSchedules = GetManagedSchedules(doc);
                 var vm = new ManageLinksViewModel(managedSchedules);
                 vm.Document = doc;
-                var mgWnd = new ManageScheduleLinksDialog(doc, vm);
+                var mgWnd = new ManageScheduleLinksDialog(vm);
 //                mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
 //                mgWnd.UpdateButtons();
                 mgWnd.ShowDialog();
@@ -64,30 +64,33 @@ namespace ElectricalToolSuite.ScheduleImport
             string scheduleName;
             string scheduleType;
 
+            PanelScheduleView schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
+            schedule.ViewName = selectedPanel.Name;
+            var link = new ManagedScheduleLink(schedule);
+
             using (var excelApplication = new Excel.Application {DisplayAlerts = false})
             {
-                var wnd = new SheetSelectionDialog(excelApplication, doc, null);
 
-                wnd.ScheduleNameTextBox.Text = selectedPanel.Name;
+                var vm = new LinkConfigurationViewModel(doc, excelApplication, link);
+                var wnd = new LinkConfigurationDialog(vm);
 
                 if (wnd.ShowDialog() != true)
                 {
                     return;
                 }
-
-                workbookPath = wnd.FilePathTextBox.Text;
-                worksheetName = (string) wnd.SheetComboBox.SelectedItem;
-                scheduleType = wnd.ScheduleTypeTextBox.Text;
-                scheduleName = wnd.ScheduleNameTextBox.Text;
+//
+//                workbookPath = wnd.FilePathTextBox.Text;
+//                worksheetName = (string) wnd.SheetComboBox.SelectedItem;
+//                scheduleType = wnd.ScheduleTypeTextBox.Text;
+//                scheduleName = wnd.ScheduleNameTextBox.Text;
 
                 excelApplication.Quit();
             }
 
-            PanelScheduleView schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
-            schedule.ViewName = scheduleName;
-
-            ImportSchedule(schedule, workbookPath, worksheetName);
-            StoreImportInformation(schedule, workbookPath, worksheetName, scheduleType);
+            Debug.Assert(link.WorkbookExists);
+            link.Reload();
+//            ImportSchedule(schedule, workbookPath, worksheetName);
+//            StoreImportInformation(schedule, workbookPath, worksheetName, scheduleType);
         }
 
         public static List<ManagedScheduleLink> GetManagedSchedules(Document doc)
