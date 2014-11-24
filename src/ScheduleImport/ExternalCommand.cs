@@ -26,10 +26,12 @@ namespace ElectricalToolSuite.ScheduleImport
 
             while (true)
             {
-                var mgWnd = new ManageScheduleLinksDialog(doc);
                 var managedSchedules = GetManagedSchedules(doc);
-                mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
-                mgWnd.UpdateButtons();
+                var vm = new ManageLinksViewModel(managedSchedules);
+                vm.Document = doc;
+                var mgWnd = new ManageScheduleLinksDialog(doc, vm);
+//                mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
+//                mgWnd.UpdateButtons();
                 mgWnd.ShowDialog();
 
                 if (mgWnd.PressedCreate)

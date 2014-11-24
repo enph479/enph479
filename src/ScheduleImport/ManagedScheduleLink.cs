@@ -1,10 +1,13 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.IO;
+using System.Runtime.CompilerServices;
 using Autodesk.Revit.DB.Electrical;
 using System;
+using ElectricalToolSuite.ScheduleImport.Annotations;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
-    public class ManagedScheduleLink
+    public class ManagedScheduleLink : INotifyPropertyChanged
     {
         private PanelScheduleView _schedule;
 
@@ -24,26 +27,39 @@ namespace ElectricalToolSuite.ScheduleImport
             }
             set
             {
-                _schedule.ViewName = value; 
+                _schedule.ViewName = value;
+                OnPropertyChanged("ScheduleName");
             }
         }
 
         public string ScheduleType
         {
             get { return LinkGateway.GetScheduleType(_schedule); }
-            set { LinkGateway.SetScheduleType(_schedule, value); }
+            set
+            {
+                LinkGateway.SetScheduleType(_schedule, value);
+                OnPropertyChanged("ScheduleType");
+            }
         }
 
         public string WorkbookPath
         {
             get { return LinkGateway.GetWorkbookPath(_schedule); }
-            set { LinkGateway.SetWorkbookPath(_schedule, value); }
+            set
+            {
+                LinkGateway.SetWorkbookPath(_schedule, value);
+                OnPropertyChanged("WorkbookPath");
+            }
         }
 
         public string WorksheetName
         {
             get { return LinkGateway.GetWorksheetName(_schedule); }
-            set { LinkGateway.SetWorksheetName(_schedule, value); }
+            set 
+            { 
+                LinkGateway.SetWorksheetName(_schedule, value);
+                OnPropertyChanged("WorksheetName");
+            }
         }
 
         public PanelScheduleView GetSchedule()
@@ -70,6 +86,15 @@ namespace ElectricalToolSuite.ScheduleImport
         public bool WorkbookExists
         {
             get { return File.Exists(WorkbookPath); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        public virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
