@@ -77,11 +77,12 @@
     <Compile Include="CellFormatting\Orientation.cs" />
     <Compile Include="CellFormatting\VerticalAlignment.cs" />
     <Compile Include="ExternalCommand.cs" />
+    <Compile Include="LinkGateway.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScheduleLinkManager.cs" />
     <Compile Include="UI\ElementSelector.cs" />
-    <Compile Include="UI\ManagedScheduleLink.cs" />
+    <Compile Include="ManagedScheduleLink.cs" />
     <Compile Include="UI\ManageScheduleLinksDialog.xaml.cs">
       <DependentUpon>ManageScheduleLinksDialog.xaml</DependentUpon>
     </Compile>

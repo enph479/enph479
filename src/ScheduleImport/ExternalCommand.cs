@@ -42,6 +42,7 @@ namespace ElectricalToolSuite.ScheduleImport
                 var mgWnd = new ManageScheduleLinksDialog(doc, uiDoc);
                 var managedSchedules = GetManagedSchedules(doc);
                 mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
+                mgWnd.UpdateButtons();
                 mgWnd.ShowDialog();
 
                 if (mgWnd.PressedCreate)
@@ -70,40 +71,44 @@ namespace ElectricalToolSuite.ScheduleImport
                 }
             }
 
-            var existingSchedule =
-                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
-                    .Cast<PanelScheduleView>()
-                    .Where(s => s.GetPanel() == selectedPanel.Id)
-                    .Take(1)
-                    .ToList();
-
-            PanelScheduleView schedule;
-
-            if (existingSchedule.Any())
-            {
-                var confirmOperation = TaskDialog.Show("Overwrite existing schedule",
-                    "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
-                    TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
-                if (confirmOperation == TaskDialogResult.Cancel)
-                {
-//                    cancelled = Result.Cancelled;
-                    return;
-                }
-
-                schedule = existingSchedule.First();
-            }
-            else
-            {
-                schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
-                schedule.ViewName = selectedPanel.Name;
-            }
+//            var existingSchedule =
+//                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
+//                    .Cast<PanelScheduleView>()
+//                    .Where(s => s.GetPanel() == selectedPanel.Id)
+//                    .Take(1)
+//                    .ToList();
+//
+//            PanelScheduleView schedule;
+//
+//            if (existingSchedule.Any())
+//            {
+//                var confirmOperation = TaskDialog.Show("Overwrite existing schedule",
+//                    "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
+//                    TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
+//                if (confirmOperation == TaskDialogResult.Cancel)
+//                {
+////                    cancelled = Result.Cancelled;
+//                    return;
+//                }
+//
+//                schedule = existingSchedule.First();
+//            }
+//            else
+//            {
+//                schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
+//                schedule.ViewName = selectedPanel.Name;
+//            }
 
             string workbookPath;
             string worksheetName;
+            string scheduleName;
+            string scheduleType;
 
             using (var excelApplication = new Excel.Application {DisplayAlerts = false})
             {
-                var wnd = new SheetSelectionDialog(excelApplication);
+                var wnd = new SheetSelectionDialog(excelApplication, doc);
+
+                wnd.ScheduleNameTextBox.Text = selectedPanel.Name;
 
                 if (wnd.ShowDialog() != true)
                 {
@@ -113,31 +118,28 @@ namespace ElectricalToolSuite.ScheduleImport
 
                 workbookPath = wnd.FilePathTextBox.Text;
                 worksheetName = (string) wnd.SheetComboBox.SelectedItem;
+                scheduleType = wnd.ScheduleTypeTextBox.Text;
+                scheduleName = wnd.ScheduleNameTextBox.Text;
 
                 excelApplication.Quit();
             }
 
+            PanelScheduleView schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
+            schedule.ViewName = scheduleName;
+
             ImportSchedule(schedule, workbookPath, worksheetName);
-            StoreImportInformation(schedule, workbookPath, worksheetName);
+            StoreImportInformation(schedule, workbookPath, worksheetName, scheduleType);
         }
 
         public static List<ManagedScheduleLink> GetManagedSchedules(Document doc)
         {
-            var schema = GetSchema();
-
             var linkedSchedules = new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
-                .Where(s => s.GetEntity(schema).IsValid())
-                .Cast<PanelScheduleView>();
-
-            var wbFld = schema.GetField("ExcelPath");
-            var wsFld = schema.GetField("ExcelWorksheetName");
+                .Cast<PanelScheduleView>()
+                .Where(LinkGateway.IsLinked);
 
             var managedSchedules =
                 (from sched in linkedSchedules
-                    let ent = sched.GetEntity(schema)
-                    let wbPath = ent.Get<string>(wbFld)
-                    let wsName = ent.Get<string>(wsFld)
-                    select new ManagedScheduleLink(sched, wbPath, wsName))
+                    select new ManagedScheduleLink(sched))
                     .OrderBy(l => l.ScheduleName)
                     .ToList();
 
@@ -503,44 +505,9 @@ namespace ElectricalToolSuite.ScheduleImport
             return cell;
         }
 
-        private static readonly Guid SchemaGuid = new Guid("9068d9ed-3e98-425f-9940-76da5c52f923");
-
-        public static Schema GetSchema()
+        public static void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName, string scheduleType)
         {
-            var schema = Schema.Lookup(SchemaGuid);
-
-            if (schema != null)
-                return schema;
-
-            var schemaBuilder = new SchemaBuilder(SchemaGuid);
-
-            schemaBuilder.SetReadAccessLevel(AccessLevel.Public);
-            schemaBuilder.SetWriteAccessLevel(AccessLevel.Public); // TODO
-//            schemaBuilder.SetVendorId("ENPH 479");
-            schemaBuilder.SetSchemaName("ExcelScheduleImport");
-
-            var fieldBuilder = schemaBuilder.AddSimpleField("ExcelPath", typeof(string));
-            fieldBuilder.SetDocumentation("The path to the Excel workbook from which this schedule was created.");
-
-            fieldBuilder = schemaBuilder.AddSimpleField("ExcelWorksheetName", typeof(string));
-            fieldBuilder.SetDocumentation("The name of the Excel worksheet within the workbook from which this schedule was created.");
-
-            return schemaBuilder.Finish();
-        }
-
-        public static void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName)
-        {
-            var schema = GetSchema();
-
-            var entity = new Entity(schema);
-
-            var pathField = schema.GetField("ExcelPath");
-            entity.Set(pathField, workbookPath);
-
-            var sheetField = schema.GetField("ExcelWorksheetName");
-            entity.Set(sheetField, worksheetName);
-
-            schedule.SetEntity(entity);
+            LinkGateway.CreateLink(schedule, workbookPath, worksheetName, scheduleType);
         }
     }
 }
