@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 namespace ElectricalToolSuite.ScheduleImport.UI
 {
@@ -12,10 +13,14 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     public partial class ManageScheduleLinksDialog
     {
         private readonly Document _document;
+        private readonly UIDocument _uiDocument;
 
-        public ManageScheduleLinksDialog(Document document)
+        public bool PressedCreate { get; private set; }
+
+        public ManageScheduleLinksDialog(Document document, UIDocument uiDocument)
         {
             _document = document;
+            _uiDocument = uiDocument;
             InitializeComponent();
         }
 
@@ -105,6 +110,20 @@ namespace ElectricalToolSuite.ScheduleImport.UI
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
+        }
+
+        private void CreateButton_Click(object sender, RoutedEventArgs e)
+        {
+            PressedCreate = true;
+            DialogResult = true;
+
+//            Visibility = System.Windows.Visibility.Collapsed;
+//
+//            var selectedPanel = new ElementSelector(_uiDocument).SelectSingle() as FamilyInstance;
+//
+//            Debug.Assert(selectedPanel != null);
+//
+//            Visibility = System.Windows.Visibility.Visible;
         }
     }
 }

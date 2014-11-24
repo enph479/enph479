@@ -25,18 +25,53 @@ namespace ElectricalToolSuite.ScheduleImport
             var uiDoc = commandData.Application.ActiveUIDocument;
             var doc = uiDoc.Document;
             
-            var selectedPanelRef = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
+//            var selectedPanelRef = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
 
-            var selectedPanel = doc.GetElement(selectedPanelRef) as FamilyInstance;
+//            var selectedPanel = doc.GetElement(selectedPanelRef) as FamilyInstance;
+
+//            Result result;
+//            CreateLink(uiDoc, doc, out result);
+//            if (result == Result.Cancelled)
+//                return result;
+
+            // TODO Put this back in
+//            uiDoc.ActiveView = schedule;
+
+            while (true)
+            {
+                var mgWnd = new ManageScheduleLinksDialog(doc, uiDoc);
+                var managedSchedules = GetManagedSchedules(doc);
+                mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
+                mgWnd.ShowDialog();
+
+                if (mgWnd.PressedCreate)
+                {
+                    CreateLink(uiDoc, doc);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return Result.Succeeded;
+        }
+
+        private static void CreateLink(UIDocument uiDoc, Document doc)
+        {
+            var selectedPanel = new ElementSelector(uiDoc).SelectSingle() as FamilyInstance;
 
             if (selectedPanel == null)
             {
                 TaskDialog.Show("Invalid selection", "Please select a panel.");
-                return Result.Cancelled;
+                {
+//                    cancelled = Result.Cancelled;
+                    return;
+                }
             }
 
             var existingSchedule =
-                new FilteredElementCollector(doc).OfClass(typeof(PanelScheduleView))
+                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
                     .Cast<PanelScheduleView>()
                     .Where(s => s.GetPanel() == selectedPanel.Id)
                     .Take(1)
@@ -50,7 +85,10 @@ namespace ElectricalToolSuite.ScheduleImport
                     "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
                     TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
                 if (confirmOperation == TaskDialogResult.Cancel)
-                    return Result.Cancelled;
+                {
+//                    cancelled = Result.Cancelled;
+                    return;
+                }
 
                 schedule = existingSchedule.First();
             }
@@ -68,26 +106,19 @@ namespace ElectricalToolSuite.ScheduleImport
                 var wnd = new SheetSelectionDialog(excelApplication);
 
                 if (wnd.ShowDialog() != true)
-                    return Result.Cancelled;
+                {
+//                    cancelled = Result.Cancelled;
+                    return;
+                }
 
                 workbookPath = wnd.FilePathTextBox.Text;
                 worksheetName = (string) wnd.SheetComboBox.SelectedItem;
 
                 excelApplication.Quit();
             }
-            
+
             ImportSchedule(schedule, workbookPath, worksheetName);
             StoreImportInformation(schedule, workbookPath, worksheetName);
-            
-            // TODO Put this back in
-//            uiDoc.ActiveView = schedule;
-
-            var mgWnd = new ManageScheduleLinksDialog(doc);
-            var managedSchedules = GetManagedSchedules(doc);
-            mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
-            mgWnd.ShowDialog();
-
-            return Result.Succeeded;
         }
 
         public static List<ManagedScheduleLink> GetManagedSchedules(Document doc)
