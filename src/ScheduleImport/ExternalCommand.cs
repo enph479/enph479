@@ -150,6 +150,9 @@ namespace ElectricalToolSuite.ScheduleImport
         {
             var tbl = schedule.GetTableData();
 
+            tbl.FreezeColumnsAndRows = false;
+//            schedule.g
+
             tbl.GetSectionData(SectionType.Header).HideSection = true;
             tbl.GetSectionData(SectionType.Footer).HideSection = true;
             tbl.GetSectionData(SectionType.Summary).HideSection = true;
@@ -157,6 +160,8 @@ namespace ElectricalToolSuite.ScheduleImport
 
             if (secData.NeedsRefresh)
                 secData.RefreshData();
+
+            const int PointsPerFoot = 864;
 
             using (var excelApplication = new Excel.Application {DisplayAlerts = false})
             {
@@ -181,7 +186,7 @@ namespace ElectricalToolSuite.ScheduleImport
                     }
                     for (int j = 1; j <= colCount; ++j)
                     {
-                        colWidths.Add((double) usedRange[1, j].ColumnWidth);
+                        colWidths.Add((double) usedRange[1, j].Width);
                     }
 
                     while (secData.NumberOfRows < rowCount + 1)
@@ -196,9 +201,15 @@ namespace ElectricalToolSuite.ScheduleImport
                     while (secData.NumberOfColumns > colCount + 1)
                         secData.RemoveColumn(secData.LastColumnNumber);
 
+//                    double totalWidth = 0.0;
                     for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
-                        secData.SetColumnWidthInPixels(colIndex + secData.FirstColumnNumber,
-                            (int) (colWidths[colIndex]));
+                    {
+//                        secData.SetColumnWidthInPixels(colIndex + secData.FirstColumnNumber, (int)(colWidths[colIndex]));
+                        var colWidthInFeet = colWidths[colIndex]/PointsPerFoot;
+                        secData.SetColumnWidth(colIndex + secData.FirstColumnNumber, colWidthInFeet);
+//                        totalWidth += colWidthInFeet;
+                    }
+                    tbl.Width = ((double) usedRange.Width)/PointsPerFoot;
 
                     for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
                         secData.SetRowHeightInPixels(rowIndex + secData.FirstRowNumber,
@@ -207,9 +218,12 @@ namespace ElectricalToolSuite.ScheduleImport
                     for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
                         for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
                             secData.ClearCell(rowIndex + secData.FirstRowNumber, colIndex + secData.FirstColumnNumber);
-
+                    
                     if (secData.NeedsRefresh)
                         secData.RefreshData();
+
+                    for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
+                        Debug.Print(secData.GetColumnWidth(colIndex + secData.FirstColumnNumber).ToString());
 
                     var cells = CreateCells(usedRange);
 
