@@ -37,9 +37,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.HiddenElementCheckBox = new System.Windows.Forms.CheckBox();
             this.FindButton = new System.Windows.Forms.Button();
             this.FindTextBox = new System.Windows.Forms.TextBox();
-            this.ReplaceTextBox = new System.Windows.Forms.TextBox();
             this.FindLabel = new System.Windows.Forms.Label();
-            this.ReplaceLabel = new System.Windows.Forms.Label();
             this.CurrentViewRadioButton = new System.Windows.Forms.RadioButton();
             this.EntireProjectRadioButton = new System.Windows.Forms.RadioButton();
             this.SelectedViewsRadioButton = new System.Windows.Forms.RadioButton();
@@ -60,9 +58,7 @@ namespace ElectricalToolSuite.FindAndReplace
             this.TableLayoutPanel.Controls.Add(this.HiddenElementCheckBox, 1, 5);
             this.TableLayoutPanel.Controls.Add(this.FindButton, 0, 10);
             this.TableLayoutPanel.Controls.Add(this.FindTextBox, 1, 0);
-            this.TableLayoutPanel.Controls.Add(this.ReplaceTextBox, 1, 1);
             this.TableLayoutPanel.Controls.Add(this.FindLabel, 0, 0);
-            this.TableLayoutPanel.Controls.Add(this.ReplaceLabel, 0, 1);
             this.TableLayoutPanel.Controls.Add(this.CurrentViewRadioButton, 0, 5);
             this.TableLayoutPanel.Controls.Add(this.EntireProjectRadioButton, 0, 8);
             this.TableLayoutPanel.Controls.Add(this.SelectedViewsRadioButton, 0, 7);
@@ -146,14 +142,6 @@ namespace ElectricalToolSuite.FindAndReplace
             this.FindTextBox.TabIndex = 0;
             this.FindTextBox.TextChanged += new System.EventHandler(this.FindTextBox_TextChanged);
             // 
-            // ReplaceTextBox
-            // 
-            this.ReplaceTextBox.Location = new System.Drawing.Point(142, 29);
-            this.ReplaceTextBox.Name = "ReplaceTextBox";
-            this.ReplaceTextBox.Size = new System.Drawing.Size(223, 20);
-            this.ReplaceTextBox.TabIndex = 1;
-            this.ReplaceTextBox.TextChanged += new System.EventHandler(this.ReplaceTextBox_TextChanged);
-            // 
             // FindLabel
             // 
             this.FindLabel.AutoSize = true;
@@ -162,15 +150,6 @@ namespace ElectricalToolSuite.FindAndReplace
             this.FindLabel.Size = new System.Drawing.Size(53, 13);
             this.FindLabel.TabIndex = 16;
             this.FindLabel.Text = "Find what";
-            // 
-            // ReplaceLabel
-            // 
-            this.ReplaceLabel.AutoSize = true;
-            this.ReplaceLabel.Location = new System.Drawing.Point(3, 26);
-            this.ReplaceLabel.Name = "ReplaceLabel";
-            this.ReplaceLabel.Size = new System.Drawing.Size(69, 13);
-            this.ReplaceLabel.TabIndex = 17;
-            this.ReplaceLabel.Text = "Replace with";
             // 
             // CurrentViewRadioButton
             // 
@@ -238,7 +217,6 @@ namespace ElectricalToolSuite.FindAndReplace
 
         private System.Windows.Forms.TableLayoutPanel TableLayoutPanel;
         private System.Windows.Forms.TextBox FindTextBox;
-        private System.Windows.Forms.TextBox ReplaceTextBox;
         private System.Windows.Forms.CheckBox CaseSensitiveCheckBox;
         private System.Windows.Forms.CheckBox WholeWordsCheckBox;
         private System.Windows.Forms.RadioButton CurrentViewRadioButton;
@@ -249,7 +227,6 @@ namespace ElectricalToolSuite.FindAndReplace
         private System.Windows.Forms.Button FindButton;
         private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Label FindLabel;
-        private System.Windows.Forms.Label ReplaceLabel;
 
     }
 }
