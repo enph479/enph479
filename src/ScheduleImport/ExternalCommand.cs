@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
-using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 using System;
 using ElectricalToolSuite.ScheduleImport.CellFormatting;
@@ -24,22 +22,13 @@ namespace ElectricalToolSuite.ScheduleImport
         {
             var uiDoc = commandData.Application.ActiveUIDocument;
             var doc = uiDoc.Document;
-            
-//            var selectedPanelRef = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
-
-//            var selectedPanel = doc.GetElement(selectedPanelRef) as FamilyInstance;
-
-//            Result result;
-//            CreateLink(uiDoc, doc, out result);
-//            if (result == Result.Cancelled)
-//                return result;
 
             // TODO Put this back in
 //            uiDoc.ActiveView = schedule;
 
             while (true)
             {
-                var mgWnd = new ManageScheduleLinksDialog(doc, uiDoc);
+                var mgWnd = new ManageScheduleLinksDialog(doc);
                 var managedSchedules = GetManagedSchedules(doc);
                 mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
                 mgWnd.UpdateButtons();
@@ -66,38 +55,9 @@ namespace ElectricalToolSuite.ScheduleImport
             {
                 TaskDialog.Show("Invalid selection", "Please select a panel.");
                 {
-//                    cancelled = Result.Cancelled;
                     return;
                 }
             }
-
-//            var existingSchedule =
-//                new FilteredElementCollector(doc).OfClass(typeof (PanelScheduleView))
-//                    .Cast<PanelScheduleView>()
-//                    .Where(s => s.GetPanel() == selectedPanel.Id)
-//                    .Take(1)
-//                    .ToList();
-//
-//            PanelScheduleView schedule;
-//
-//            if (existingSchedule.Any())
-//            {
-//                var confirmOperation = TaskDialog.Show("Overwrite existing schedule",
-//                    "The selected panel already has a schedule.  This operation will overwrite the existing schedule.  Proceed?",
-//                    TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel);
-//                if (confirmOperation == TaskDialogResult.Cancel)
-//                {
-////                    cancelled = Result.Cancelled;
-//                    return;
-//                }
-//
-//                schedule = existingSchedule.First();
-//            }
-//            else
-//            {
-//                schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
-//                schedule.ViewName = selectedPanel.Name;
-//            }
 
             string workbookPath;
             string worksheetName;
@@ -112,7 +72,6 @@ namespace ElectricalToolSuite.ScheduleImport
 
                 if (wnd.ShowDialog() != true)
                 {
-//                    cancelled = Result.Cancelled;
                     return;
                 }
 
@@ -151,7 +110,6 @@ namespace ElectricalToolSuite.ScheduleImport
             var tbl = schedule.GetTableData();
 
             tbl.FreezeColumnsAndRows = false;
-//            schedule.g
 
             tbl.GetSectionData(SectionType.Header).HideSection = true;
             tbl.GetSectionData(SectionType.Footer).HideSection = true;
@@ -161,7 +119,7 @@ namespace ElectricalToolSuite.ScheduleImport
             if (secData.NeedsRefresh)
                 secData.RefreshData();
 
-            const int PointsPerFoot = 864;
+            const int pointsPerFoot = 864;
 
             using (var excelApplication = new Excel.Application {DisplayAlerts = false})
             {
@@ -173,7 +131,7 @@ namespace ElectricalToolSuite.ScheduleImport
                     var worksheet = workbook.Worksheets.Cast<Excel.Worksheet>().First(s => s.Name == worksheetName);
 
                     var usedRange = worksheet.UsedRange;
-                    
+
                     int rowCount = usedRange.Rows.Count;
                     int colCount = usedRange.Columns.Count;
 
@@ -201,15 +159,12 @@ namespace ElectricalToolSuite.ScheduleImport
                     while (secData.NumberOfColumns > colCount + 1)
                         secData.RemoveColumn(secData.LastColumnNumber);
 
-//                    double totalWidth = 0.0;
                     for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
                     {
-//                        secData.SetColumnWidthInPixels(colIndex + secData.FirstColumnNumber, (int)(colWidths[colIndex]));
-                        var colWidthInFeet = colWidths[colIndex]/PointsPerFoot;
+                        var colWidthInFeet = colWidths[colIndex]/pointsPerFoot;
                         secData.SetColumnWidth(colIndex + secData.FirstColumnNumber, colWidthInFeet);
-//                        totalWidth += colWidthInFeet;
                     }
-                    tbl.Width = ((double) usedRange.Width)/PointsPerFoot;
+                    tbl.Width = ((double) usedRange.Width)/pointsPerFoot;
 
                     for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
                         secData.SetRowHeightInPixels(rowIndex + secData.FirstRowNumber,
@@ -218,12 +173,9 @@ namespace ElectricalToolSuite.ScheduleImport
                     for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
                         for (int rowIndex = 0; rowIndex < rowHeights.Count; ++rowIndex)
                             secData.ClearCell(rowIndex + secData.FirstRowNumber, colIndex + secData.FirstColumnNumber);
-                    
+
                     if (secData.NeedsRefresh)
                         secData.RefreshData();
-
-                    for (int colIndex = 0; colIndex < colWidths.Count; ++colIndex)
-                        Debug.Print(secData.GetColumnWidth(colIndex + secData.FirstColumnNumber).ToString());
 
                     var cells = CreateCells(usedRange);
 
@@ -394,7 +346,7 @@ namespace ElectricalToolSuite.ScheduleImport
                     return VerticalAlignmentStyle.Middle;
                 case VerticalAlignment.Bottom:
                     return VerticalAlignmentStyle.Bottom;
-                case VerticalAlignment.Top  :
+                case VerticalAlignment.Top:
                     return VerticalAlignmentStyle.Top;
                 default:
                     throw new ArgumentException("alignment");
@@ -415,8 +367,6 @@ namespace ElectricalToolSuite.ScheduleImport
                     var cell = range[i, j];
                     if (!((bool) cell.MergeCells && !cell.MergeArea.Address.StartsWith(cell.Address)))
                         cells.Add(CreateCell(cell, i, j));
-
-                    Debug.Print("{0}, {1}", i, j);
                 }
             }
 
@@ -488,7 +438,6 @@ namespace ElectricalToolSuite.ScheduleImport
                 HorizontalAlignment = ConvertHorizontalAlignment((XlHAlign) interopCell.HorizontalAlignment),
                 VerticalAlignment = ConvertVerticalAlignment((XlVAlign) interopCell.VerticalAlignment),
                 Orientation = ConvertOrientation((XlOrientation) interopCell.Orientation),
-
                 BottomBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeBottom]),
                 TopBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeTop]),
                 LeftBorderLine = ConvertBorder(borders[XlBordersIndex.xlEdgeLeft]),
@@ -513,13 +462,11 @@ namespace ElectricalToolSuite.ScheduleImport
                 cell.NumberOfRows = 1;
             }
 
-            Debug.Assert(cell.ColumnIndex >= 0);
-            Debug.Assert(cell.RowIndex >= 0);
-
             return cell;
         }
 
-        public static void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName, string scheduleType)
+        public static void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName,
+            string scheduleType)
         {
             LinkGateway.CreateLink(schedule, workbookPath, worksheetName, scheduleType);
         }

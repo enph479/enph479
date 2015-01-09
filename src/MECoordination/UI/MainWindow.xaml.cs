@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Autodesk.Revit.UI;
 
 namespace ElectricalToolSuite.MECoordination.UI
 {

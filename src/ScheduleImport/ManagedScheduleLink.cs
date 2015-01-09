@@ -1,16 +1,12 @@
 ﻿using System.IO;
 using Autodesk.Revit.DB.Electrical;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
     public class ManagedScheduleLink
     {
-        private PanelScheduleView _schedule;
+        private readonly PanelScheduleView _schedule;
 
         public ManagedScheduleLink(PanelScheduleView schedule)
         {
@@ -22,14 +18,8 @@ namespace ElectricalToolSuite.ScheduleImport
 
         public string ScheduleName
         {
-            get
-            {
-                return _schedule.ViewName; 
-            }
-            set
-            {
-                _schedule.ViewName = value; 
-            }
+            get { return _schedule.ViewName; }
+            set { _schedule.ViewName = value; }
         }
 
         public string ScheduleType
@@ -58,7 +48,7 @@ namespace ElectricalToolSuite.ScheduleImport
         public void Reload()
         {
             if (WorkbookExists)
-                ExternalCommand.ImportSchedule(_schedule, WorkbookPath, WorksheetName);            
+                ExternalCommand.ImportSchedule(_schedule, WorkbookPath, WorksheetName);
         }
 
         public string StatusText

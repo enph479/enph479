@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable InconsistentNaming
 
-namespace ElectricalToolSuite.MECoordination.UI.Annotations
+namespace ElectricalToolSuite.MECoordination.Properties
 {
     /// <summary>
     /// Indicates that the value of the marked element could be <c>null</c> sometimes,

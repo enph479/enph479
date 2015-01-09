@@ -57,6 +57,8 @@ namespace ElectricalToolSuite.ExtensionLoader
         private static Assembly LoadAssembly(string assemblyLocation, string targetAssembly)
         {
             var currentDirectory = Path.GetDirectoryName(assemblyLocation);
+            if (currentDirectory == null)
+                throw new NullReferenceException("GetDirectoryName returned null");
             var assemblyBytes = File.ReadAllBytes(Path.Combine(currentDirectory, targetAssembly));
             var assembly = Assembly.Load(assemblyBytes);
             return assembly;
@@ -77,6 +79,8 @@ namespace ElectricalToolSuite.ExtensionLoader
         Assembly LoadFromSameFolder(object sender, ResolveEventArgs args)
         {
             var folderPath = Path.GetDirectoryName(GetType().Assembly.Location);
+            if (folderPath == null)
+                throw new NullReferenceException("GetDirectoryName returned null");
             var assemblyPath = Path.Combine(folderPath, new AssemblyName(args.Name).Name + ".dll");
             if (File.Exists(assemblyPath) == false) 
                 return null;

@@ -4,7 +4,7 @@ using Autodesk.Revit.DB.Electrical;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
-    static class LinkGateway
+    internal static class LinkGateway
     {
         private const string SchemaName = "ExcelScheduleLinkSchema";
         private const string WorkbookPathKey = "WorkbookPath";
@@ -26,13 +26,14 @@ namespace ElectricalToolSuite.ScheduleImport
             //            schemaBuilder.SetVendorId("ENPH 479");
             schemaBuilder.SetSchemaName(SchemaName);
 
-            var fieldBuilder = schemaBuilder.AddSimpleField(WorkbookPathKey, typeof(string));
+            var fieldBuilder = schemaBuilder.AddSimpleField(WorkbookPathKey, typeof (string));
             fieldBuilder.SetDocumentation("The path to the Excel workbook from which this schedule was created.");
 
-            fieldBuilder = schemaBuilder.AddSimpleField(WorksheetNameKey, typeof(string));
-            fieldBuilder.SetDocumentation("The name of the Excel worksheet within the workbook from which this schedule was created.");
+            fieldBuilder = schemaBuilder.AddSimpleField(WorksheetNameKey, typeof (string));
+            fieldBuilder.SetDocumentation(
+                "The name of the Excel worksheet within the workbook from which this schedule was created.");
 
-            fieldBuilder = schemaBuilder.AddSimpleField(ScheduleTypeKey, typeof(string));
+            fieldBuilder = schemaBuilder.AddSimpleField(ScheduleTypeKey, typeof (string));
             fieldBuilder.SetDocumentation("The type of this schedule.");
 
             return schemaBuilder.Finish();

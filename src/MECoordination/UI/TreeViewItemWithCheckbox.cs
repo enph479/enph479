@@ -3,8 +3,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using ElectricalToolSuite.MECoordination.UI.Annotations;
 using Autodesk.Revit.DB;
+using ElectricalToolSuite.MECoordination.Properties;
 
 namespace ElectricalToolSuite.MECoordination.UI
 {

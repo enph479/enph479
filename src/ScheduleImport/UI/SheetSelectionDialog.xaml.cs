@@ -20,9 +20,9 @@ namespace ElectricalToolSuite.ScheduleImport.UI
         public bool HasValidExcelFile { get; set; }
         public string ValidName { get; set; }
         private readonly Excel.Application _excelApplication;
-        private readonly Autodesk.Revit.DB.Document _document;
+        private readonly Document _document;
 
-        public SheetSelectionDialog(Excel.Application excelApplication, Autodesk.Revit.DB.Document doc)
+        public SheetSelectionDialog(Excel.Application excelApplication, Document doc)
         {
             _excelApplication = excelApplication;
             _document = doc;
@@ -34,7 +34,7 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             Closing += SheetSelectionDialog_Closing;
         }
 
-        void SheetSelectionDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void SheetSelectionDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             var scheduleName = ScheduleNameTextBox.Text;
 
@@ -57,7 +57,7 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             }
         }
 
-        void FilePathTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void FilePathTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (System.IO.File.Exists(FilePathTextBox.Text))
             {
