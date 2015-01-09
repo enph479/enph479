@@ -470,7 +470,7 @@ namespace ElectricalToolSuite.ScheduleImport
         private static Cell CreateCell(Excel.Range interopCell, int rowIndex, int columnIndex)
         {
             var font = interopCell.Font;
-            var borders = interopCell.Borders;
+            var borders = (bool) interopCell.MergeCells ? interopCell.MergeArea.Borders : interopCell.Borders;
             var interior = interopCell.Interior;
 
             var cell = new Cell
