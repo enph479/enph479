@@ -1,6 +1,4 @@
-﻿using System.Windows.Forms;
-
-namespace ElectricalToolSuite.FindAndReplace
+﻿namespace ElectricalToolSuite.FindAndReplace.UI
 {
     partial class FindAndReplaceWindow
     {

@@ -1,8 +1,9 @@
-﻿<Page x:Class="ElectricalToolSuite.FindAndReplace.FindResultsWindow"
+﻿<Page x:Class="ElectricalToolSuite.FindAndReplace.UI.FindResultsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:findAndReplace="clr-namespace:ElectricalToolSuite.FindAndReplace"
       Name="FindResults"
       Title="FindResults"
       Width="300"
@@ -18,7 +19,7 @@
                     <GridViewColumn Width="150" Header="Family Type" DisplayMemberBinding ="{Binding Path=MatchingElement.Symbol.Name}"/>
                     <GridViewColumn Header="Parameter Name(s)">
                         <GridViewColumn.CellTemplate>
-                            <DataTemplate>
+                            <DataTemplate DataType="findAndReplace:ResultsDto">
                                 <ItemsControl ItemsSource="{Binding MatchingParameters}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -37,7 +38,8 @@
                     <GridViewColumn Header="Parameter Value(s)">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ItemsControl ItemsSource="{Binding MatchingParameters}">
+                                <ItemsControl ItemsSource="{Binding MatchingParameters}"
+                                              d:DataContext="{d:DesignInstance findAndReplace:ResultsDto }">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal" />

@@ -28,7 +28,6 @@ namespace ElectricalToolSuite.FindAndReplace
             {
                 foreach (FamilyInstance elem in allElements.Cast<FamilyInstance>())
                 {
-                    var matchingParamList = new List<MatchingParameterDto>();
                     var elementVisible = false;
                     foreach (ViewSelectorDto view in allViews)
                     {
@@ -46,14 +45,7 @@ namespace ElectricalToolSuite.FindAndReplace
                         continue;
                     }
 
-                    foreach (Parameter param in elem.Parameters)
-                    {
-                        if (!String.IsNullOrEmpty(param.AsString())
-                            && Regex.Match(param.AsString(), _searchText, _compareOptions).Success)
-                        {
-                            matchingParamList.Add(new MatchingParameterDto(param.ToString(), param.AsString()));
-                        }   
-                    }
+                    var matchingParamList = (from Parameter param in elem.Parameters where !String.IsNullOrEmpty(param.AsString()) && Regex.Match(param.AsString(), _searchText, _compareOptions).Success select new MatchingParameterDto(param.ToString(), param.AsString())).ToList();
                     if (matchingParamList.Count > 0)
                     {
                         matchingElements.Add(new ResultsDto(elem, new ObservableCollection<MatchingParameterDto>(matchingParamList)));

@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Windows.Documents;
 using Autodesk.Revit.DB;
-using ElectricalToolSuite.FindAndReplace.UI;
 using Form = System.Windows.Forms.Form;
 
-namespace ElectricalToolSuite.FindAndReplace
+namespace ElectricalToolSuite.FindAndReplace.UI
 {
     public partial class FindAndReplaceWindow : Form
     {
         public bool NotCancelled { set; get; }
         private readonly FinderSettings _finderSettings;
-        private List<ViewSelectorDto> _searchableViews;
+        private readonly List<ViewSelectorDto> _searchableViews;
         public FindAndReplaceWindow(FilteredElementCollector allViews, View activeView)
         {
             InitializeComponent();
             _finderSettings = new FinderSettings();
             _searchableViews = new List<ViewSelectorDto>();
 
-            foreach (View view in allViews.OfType<ViewPlan>())
+            foreach (var view in allViews.OfType<ViewPlan>())
             {
                 _searchableViews.Add(view.Id.Equals(activeView.Id)
                     ? new ViewSelectorDto(true, view)

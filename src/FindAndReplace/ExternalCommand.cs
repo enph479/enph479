@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using ElectricalToolSuite.FindAndReplace.UI;
 
 namespace ElectricalToolSuite.FindAndReplace
 {

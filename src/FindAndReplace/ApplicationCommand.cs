@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using ElectricalToolSuite.FindAndReplace.UI;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
@@ -65,15 +67,9 @@ namespace ElectricalToolSuite.FindAndReplace
 
                 //Changing the views and stuff
                 View currentView = uidoc.ActiveView;
-                UIView uiview = null;
                 IList<UIView> uiviews = uidoc.GetOpenUIViews(); //this is dumb but is the way thebuildingcoder does it
 
-                foreach (UIView uv in uiviews)
-                {
-                    if (!uv.ViewId.Equals(currentView.Id)) continue;
-                    uiview = uv;
-                    break;
-                }
+                UIView uiview = uiviews.FirstOrDefault(uv => uv.ViewId.Equals(currentView.Id));
                 if (Globals.SelectedElement != null && uiview != null)
                 {
                     var elem = document.GetElement(Globals.SelectedElement);

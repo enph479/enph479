@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
 
-namespace ElectricalToolSuite.FindAndReplace
+namespace ElectricalToolSuite.FindAndReplace.UI
 {
     /// <summary>
     /// Interaction logic for FindResultsUI.xaml
