@@ -33,11 +33,6 @@ namespace ElectricalToolSuite.FindAndReplace
             _finderSettings.SearchText = FindTextBox.Text;
         }
 
-        private void ReplaceTextBox_TextChanged(object sender, EventArgs e)
-        {
-            _finderSettings.ReplaceText = ReplaceTextBox.Text;
-        }
-
         private void CaseSensitiveCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             _finderSettings.CaseSensitive = CaseSensitiveCheckBox.Checked;
@@ -111,6 +106,16 @@ namespace ElectricalToolSuite.FindAndReplace
                 }
             }
             return _searchableViews;
+        }
+
+        private void FindLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FindAndReplaceWindow_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -15,7 +13,7 @@ namespace ElectricalToolSuite.FindAndReplace
         public Result OnStartup(UIControlledApplication application)
         {
             // Add a new ribbon panel
-            RibbonPanel ribbonPanel = application.CreateRibbonPanel("NewRibbonPanel");
+            RibbonPanel ribbonPanel = application.CreateRibbonPanel("Find Tool");
 
             string thisAssemblyPath = Assembly.GetExecutingAssembly().Location;
             PushButtonData buttonData = new PushButtonData("FindCmd",
@@ -23,8 +21,8 @@ namespace ElectricalToolSuite.FindAndReplace
 
             ribbonPanel.AddItem(buttonData);
 
-            application.Idling += new EventHandler<IdlingEventArgs>(OnIdling);
-            application.Idling += new EventHandler<IdlingEventArgs>(ForceHideDockablePane);
+            application.Idling += OnIdling;
+            application.Idling += ForceHideDockablePane;
 
             var dPid = new DockablePaneId(DockConstants.Id);
             if (!DockablePane.PaneIsRegistered(dPid))
@@ -40,15 +38,11 @@ namespace ElectricalToolSuite.FindAndReplace
         {
             var app = sender as UIApplication;
             var dPid = new DockablePaneId(DockConstants.Id);
-            try
+            if (app != null)
             {
                 var pane = app.GetDockablePane(dPid);
                 pane.Hide();
                 app.Idling -= ForceHideDockablePane;
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception.Message);
             }
         }
 

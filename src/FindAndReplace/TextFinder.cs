@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Media.Media3D;
 using Autodesk.Revit.DB;
 
 namespace ElectricalToolSuite.FindAndReplace
@@ -13,8 +12,7 @@ namespace ElectricalToolSuite.FindAndReplace
         private readonly String _searchText;
         private readonly RegexOptions _compareOptions;
         private readonly bool _showHiddenElements;
-        public TextFinder(String searchText, RegexOptions compareOptions,
-            Document document, bool showHiddenElements)
+        public TextFinder(String searchText, RegexOptions compareOptions, bool showHiddenElements)
         {
             _searchText = searchText;
             _compareOptions = compareOptions;
@@ -26,51 +24,54 @@ namespace ElectricalToolSuite.FindAndReplace
             List<ViewSelectorDto> allViews)
         {
             var matchingElements = new List<ResultsDto>();
-            foreach (FamilyInstance elem in allElements.Cast<FamilyInstance>())
+            for (int iterator = 0; iterator <= 100; iterator++)
             {
-                var matchingParamList = new List<MatchingParameterDto>();
-                var elementVisible = false;
-                foreach (ViewSelectorDto view in allViews)
+                foreach (FamilyInstance elem in allElements.Cast<FamilyInstance>())
                 {
-                    if (view.IsChecked)
+                    var matchingParamList = new List<MatchingParameterDto>();
+                    var elementVisible = false;
+                    foreach (ViewSelectorDto view in allViews)
                     {
-                        if (!elem.IsHidden(view.View))
+                        if (view.IsChecked)
                         {
-                            elementVisible = true;
-                        }       
+                            if (!elem.IsHidden(view.View))
+                            {
+                                elementVisible = true;
+                            }       
+                        }
+                    }
+
+                    if (!elementVisible && !_showHiddenElements)
+                    {
+                        continue;
+                    }
+
+                    foreach (Parameter param in elem.Parameters)
+                    {
+                        if (!String.IsNullOrEmpty(param.AsString())
+                            && Regex.Match(param.AsString(), _searchText, _compareOptions).Success)
+                        {
+                            matchingParamList.Add(new MatchingParameterDto(param.ToString(), param.AsString()));
+                        }   
+                    }
+                    if (matchingParamList.Count > 0)
+                    {
+                        matchingElements.Add(new ResultsDto(elem, new ObservableCollection<MatchingParameterDto>(matchingParamList)));
                     }
                 }
 
-                if (!elementVisible && !_showHiddenElements)
+                foreach (TextNote elem in allTextBoxes.Cast<TextNote>())
                 {
-                    continue;
-                }
-
-                foreach (Parameter param in elem.Parameters)
-                {
-                    if (!String.IsNullOrEmpty(param.AsString())
-                        && Regex.Match(param.AsString(), _searchText, _compareOptions).Success)
+                    var matchingParamList = new List<MatchingParameterDto>();
+                    if (!String.IsNullOrEmpty(elem.Text)
+                            && Regex.Match(elem.Text, _searchText, _compareOptions).Success)
+                        {
+                            matchingParamList.Add(new MatchingParameterDto("TextBox Text", elem.Text));
+                        }
+                    if (matchingParamList.Count > 0)
                     {
-                        matchingParamList.Add(new MatchingParameterDto(param.ToString(), param.AsString()));
-                    }   
-                }
-                if (matchingParamList.Count > 0)
-                {
-                    matchingElements.Add(new ResultsDto(elem, new ObservableCollection<MatchingParameterDto>(matchingParamList)));
-                }
-            }
-
-            foreach (TextNote elem in allTextBoxes.Cast<TextNote>())
-            {
-                var matchingParamList = new List<MatchingParameterDto>();
-                if (!String.IsNullOrEmpty(elem.Text)
-                        && Regex.Match(elem.Text, _searchText, _compareOptions).Success)
-                    {
-                        matchingParamList.Add(new MatchingParameterDto("TextBox Text", elem.Text));
+                        matchingElements.Add(new ResultsDto(elem, new ObservableCollection<MatchingParameterDto>(matchingParamList)));
                     }
-                if (matchingParamList.Count > 0)
-                {
-                    matchingElements.Add(new ResultsDto(elem, new ObservableCollection<MatchingParameterDto>(matchingParamList)));
                 }
             }
             return matchingElements;

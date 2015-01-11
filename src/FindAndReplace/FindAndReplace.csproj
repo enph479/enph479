@@ -86,9 +86,6 @@
       <DependentUpon>FindAndReplaceWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="FinderSettings.cs" />
-    <Compile Include="UI\DebugFindResults.xaml.cs">
-      <DependentUpon>DebugFindResults.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\FindResultsWindow.xaml.cs">
       <DependentUpon>FindResultsWindow.xaml</DependentUpon>
     </Compile>
@@ -98,9 +95,6 @@
     <Compile Include="SearchViewSettings.cs" />
     <Compile Include="TextFinder.cs" />
     <Compile Include="TextFinderBuilder.cs" />
-    <Compile Include="UI\DockPage.xaml.cs">
-      <DependentUpon>DockPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\SelectedViewResults.xaml.cs">
       <DependentUpon>SelectedViewResults.xaml</DependentUpon>
     </Compile>
@@ -112,17 +106,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\DebugFindResults.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI\FindResultsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\DockPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SelectedViewResults.xaml">
       <SubType>Designer</SubType>

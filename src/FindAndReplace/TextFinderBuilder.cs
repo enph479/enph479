@@ -1,7 +1,5 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using Autodesk.Revit.Creation;
-using Document = Autodesk.Revit.DB.Document;
+﻿using System.Text.RegularExpressions;
+using Autodesk.Revit.DB;
 
 namespace ElectricalToolSuite.FindAndReplace
 {
@@ -22,7 +20,7 @@ namespace ElectricalToolSuite.FindAndReplace
                 searchText = @"\b" + searchText + @"\b";
             }
 
-            return new TextFinder(searchText, caseSensitive, document, finderSettings.HiddenElements);
+            return new TextFinder(searchText, caseSensitive, finderSettings.HiddenElements);
         }
     }
 }
