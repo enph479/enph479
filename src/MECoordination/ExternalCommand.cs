@@ -8,6 +8,8 @@ using Autodesk.Revit.UI;
 using ElectricalToolSuite.MECoordination.UI;
 using Settings = ElectricalToolSuite.MECoordination.Properties.Settings;
 
+// TODO Move Workset button to the right
+
 namespace ElectricalToolSuite.MECoordination
 {
     [Transaction(TransactionMode.Automatic)]

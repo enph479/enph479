@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindAndReplace", "FindAndRe
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "ElectricalToolSuiteInstaller", "Installer\ElectricalToolSuiteInstaller.wixproj", "{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport", "ScheduleImport\ScheduleImport.csproj", "{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,8 +57,8 @@ Global
 		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Debug|x64.ActiveCfg = Debug|x86
 		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Release|Any CPU.ActiveCfg = Release|x86
-		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Release|x64.ActiveCfg = Release|x86
+		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
