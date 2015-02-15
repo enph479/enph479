@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Data;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.UI;
 using ElectricalToolSuite.ScheduleImport.UI;
 using Excel = NetOffice.ExcelApi;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
@@ -50,20 +54,20 @@ namespace ElectricalToolSuite.ScheduleImport
                 }
             }
 
-            var wnd = new SheetSelectionDialog(doc)
-            {
-                ScheduleNameTextBox = {Text = selectedPanel.Name}
-            };
+            var wnd = new SheetSelectionDialog(doc);
+            wnd.ScheduleNameTextBox.Text = selectedPanel.Name;
+//            wnd.ScheduleName = selectedPanel.Name;
+            wnd.ScheduleNameTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
             if (wnd.ShowDialog() != true)
             {
                 return;
             }
 
-            var workbookPath = wnd.FilePathTextBox.Text;
+            var workbookPath = wnd.WorkbookPath;
             var worksheetName = (string) wnd.SheetComboBox.SelectedItem;
             var scheduleType = wnd.ScheduleTypeTextBox.Text;
-            var scheduleName = wnd.ScheduleNameTextBox.Text;
+            var scheduleName = wnd.ScheduleName;
 
             var schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
             schedule.ViewName = scheduleName;

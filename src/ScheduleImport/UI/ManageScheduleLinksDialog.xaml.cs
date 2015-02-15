@@ -68,10 +68,10 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             var wnd = new SheetSelectionDialog(_document);
 
-            wnd.ScheduleNameTextBox.Text = selectedLink.ScheduleName;
+            wnd.ScheduleName = selectedLink.ScheduleName;
             wnd.ScheduleTypeTextBox.Text = selectedLink.ScheduleType;
 
-            wnd.FilePathTextBox.Text = selectedLink.WorkbookPath;
+            wnd.WorkbookPath = selectedLink.WorkbookPath;
 
             wnd.OkButton.Content = "Save";
 
@@ -79,19 +79,15 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             wnd.Title = "Edit Excel Schedule Link";
 
-                if (wnd.ShowDialog() != true)
-                    return;
+            if (wnd.ShowDialog() != true)
+                return;
 
-                var workbookPath = wnd.FilePathTextBox.Text;
-                var worksheetName = (string)wnd.SheetComboBox.SelectedItem;
-                var scheduleName = wnd.ScheduleNameTextBox.Text;
-                var scheduleType = wnd.ScheduleTypeTextBox.Text;
-
-            selectedLink.WorkbookPath = workbookPath;
-            selectedLink.WorksheetName = worksheetName;
-            selectedLink.ScheduleName = scheduleName;
-            selectedLink.ScheduleType = scheduleType;
+            selectedLink.WorkbookPath = wnd.WorkbookPath;
+            selectedLink.WorksheetName = (string)wnd.SheetComboBox.SelectedItem;
+            selectedLink.ScheduleName = wnd.ScheduleName;
+            selectedLink.ScheduleType = wnd.ScheduleTypeTextBox.Text;
             selectedLink.Reload();
+
             ManagedScheduleLinksDataGrid.ItemsSource = ExternalCommand.GetManagedSchedules(_document);
             ManagedScheduleLinksDataGrid.Items.Refresh();
 

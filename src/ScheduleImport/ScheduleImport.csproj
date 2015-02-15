@@ -88,6 +88,7 @@
     <Compile Include="UI\ManageScheduleLinksDialog.xaml.cs">
       <DependentUpon>ManageScheduleLinksDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ScheduleNameValidator.cs" />
     <Compile Include="UI\SheetSelectionDialog.xaml.cs">
       <DependentUpon>SheetSelectionDialog.xaml</DependentUpon>
     </Compile>
