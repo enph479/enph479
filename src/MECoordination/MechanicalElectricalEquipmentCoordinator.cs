@@ -44,6 +44,9 @@ namespace ElectricalToolSuite.MECoordination
 
         private static void SetWorkset(FamilyInstance newInstance, Workset workset)
         {
+            if (workset == null)
+                return;
+
             var worksetParameter = newInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
             worksetParameter.Set(workset.Id.IntegerValue);
         }
