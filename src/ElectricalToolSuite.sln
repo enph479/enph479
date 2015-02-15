@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindAndReplace", "FindAndRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport", "ScheduleImport\ScheduleImport.csproj", "{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "Installer\Installer.vdproj", "{5D8CF713-49D0-4E51-8956-B8804F532918}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,13 @@ Global
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Any CPU.ActiveCfg = Debug
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Mixed Platforms.Build.0 = Debug
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|x64.ActiveCfg = Debug
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Any CPU.ActiveCfg = Release
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Mixed Platforms.ActiveCfg = Release
+		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

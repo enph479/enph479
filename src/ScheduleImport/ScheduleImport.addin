@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Assembly>.\ScheduleImport.bundle\ScheduleImport.dll</Assembly>
+    <AddInId>BD642FF7-05E7-40E8-B993-D1FA89D7CF45</AddInId>
+    <FullClassName>ElectricalToolSuite.ScheduleImport.ExternalCommand</FullClassName>
+    <Text>Electrical Schedule Importer</Text>
+    <VendorId>Forrest Paul</VendorId>
+    <VendorDescription></VendorDescription>
+  </AddIn>
+</RevitAddIns>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Assembly>.\MECoordination.bundle\MECoordination.dll</Assembly>
+    <AddInId>76D67165-F31E-4BF6-ABA7-2178B5C3E7A9</AddInId>
+    <FullClassName>ElectricalToolSuite.MECoordination.ExternalCommand</FullClassName>
+    <Text>Mechanical-Electrical Equipment Coordinator</Text>
+    <VendorId>Forrest Paul</VendorId>
+    <VendorDescription></VendorDescription>
+  </AddIn>
+</RevitAddIns>
