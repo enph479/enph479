@@ -10,8 +10,27 @@
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" CanExecute="CommandBinding_CanExecute"/>
     </Window.CommandBindings>
-    <Grid>
-        <DataGrid x:Name="ManagedScheduleLinksDataGrid" IsReadOnly="True" Margin="30,10,30,100" SelectionMode="Single" AutoGenerateColumns="False" SelectedCellsChanged="ManagedScheduleLinksDataGrid_SelectedCellsChanged">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Margin="15,0,15,15">
+            <DockPanel>
+                <WrapPanel Orientation="Horizontal">
+                    <Button x:Name="CreateButton" Content="Create..." Width="75" Height="25" Command="ApplicationCommands.Close" Click="CreateButton_Click" Margin="0,0,5,0" />
+                    <Button x:Name="EditButton" Content="Edit..." Width="75" IsEnabled="False" Click="EditButton_Click" Height="25" Margin="0,0,5,0"/>
+                    <Button x:Name="RemoveButton" Content="Remove" Width="75" IsEnabled="False" Click="RemoveButton_Click" Height="25" Margin="0,0,5,0"/>
+                </WrapPanel>
+                <WrapPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                    <Button x:Name="ReloadAllButton" Content="Reload All" Height="25" Click="ReloadAllButton_Click" Width="75" Margin="0"/>
+                    <Button x:Name="ReloadButton" Content="Reload" IsEnabled="False" Click="ReloadButton_Click" Height="25" Width="75" Margin="5,0,0,0"/>
+                    <Button x:Name="RefreshButton" Content="Refresh" Width="75" Click="RefreshButton_Click" Margin="5,0,0,0"/>
+                </WrapPanel>
+            </DockPanel>
+            <WrapPanel FlowDirection="RightToLeft" Margin="0,20,0,0">
+                <Button x:Name="CancelButton" Content="Cancel" Width="75" IsCancel="True" Height="25" Margin="0,0,5,0"/>
+                <Button x:Name="OkButton" Content="OK" Width="75" Command="ApplicationCommands.Close" Height="25" Click="OkButton_Click" />
+            </WrapPanel>
+        </StackPanel>
+        
+        <DataGrid x:Name="ManagedScheduleLinksDataGrid" IsReadOnly="True" Margin="15,15,15,5" SelectionMode="Single" AutoGenerateColumns="False" SelectedCellsChanged="ManagedScheduleLinksDataGrid_SelectedCellsChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding ScheduleName}" />
                 <DataGridTextColumn Header="Type" Binding="{Binding ScheduleType}" />
@@ -20,13 +39,5 @@
                 <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="75"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="ReloadButton" Content="Reload" Margin="0,0,110,70" VerticalAlignment="Bottom" IsEnabled="False" Click="ReloadButton_Click" Height="25" HorizontalAlignment="Right" Width="75"/>
-        <Button x:Name="EditButton" Content="Edit..." HorizontalAlignment="Left" Margin="110,0,0,70" VerticalAlignment="Bottom" Width="75" IsEnabled="False" Click="EditButton_Click" Height="25"/>
-        <Button x:Name="RemoveButton" Content="Remove" HorizontalAlignment="Left" Margin="190,0,0,70" VerticalAlignment="Bottom" Width="75" IsEnabled="False" Click="RemoveButton_Click" Height="25"/>
-        <Button x:Name="OkButton" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,13" VerticalAlignment="Bottom" Width="75" Command="ApplicationCommands.Close" Height="25" Click="OkButton_Click"/>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,19,13" VerticalAlignment="Bottom" Width="75" IsCancel="True" Height="25"/>
-        <Button x:Name="CreateButton" Content="Create..." HorizontalAlignment="Left" Margin="30,0,0,70" VerticalAlignment="Bottom" Width="75" Height="25" Command="ApplicationCommands.Close" Click="CreateButton_Click"/>
-        <Button x:Name="ReloadAllButton" Content="Reload All" Margin="0,0,30,70" VerticalAlignment="Bottom" Height="25" Click="ReloadAllButton_Click" HorizontalAlignment="Right" Width="75"/>
-        <Button x:Name="RefreshButton" Content="Refresh" Margin="0,0,190,70" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="RefreshButton_Click"/>
-    </Grid>
+    </DockPanel>
 </Window>
