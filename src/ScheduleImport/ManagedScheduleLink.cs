@@ -1,16 +1,21 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Autodesk.Revit.DB.Electrical;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectricalToolSuite.ScheduleImport
 {
     public class ManagedScheduleLink
     {
-        private PanelScheduleView _schedule;
+        private readonly PanelScheduleView _schedule;
+
+        public static ManagedScheduleLink CreateNew(PanelScheduleView schedule, string workbookPath,
+            string worksheetName, string scheduleType)
+        {
+            var importer = new ScheduleImporter(schedule);
+            importer.ImportFromFile(workbookPath, worksheetName);
+            LinkGateway.CreateLink(schedule, workbookPath, worksheetName, scheduleType);
+            return new ManagedScheduleLink(schedule);
+        }
 
         public ManagedScheduleLink(PanelScheduleView schedule)
         {

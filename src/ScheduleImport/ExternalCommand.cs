@@ -50,37 +50,25 @@ namespace ElectricalToolSuite.ScheduleImport
                 }
             }
 
-            string workbookPath;
-            string worksheetName;
-            string scheduleName;
-            string scheduleType;
-
-            using (var excelApplication = new Excel.Application {DisplayAlerts = false})
+            var wnd = new SheetSelectionDialog(doc)
             {
-                var wnd = new SheetSelectionDialog(excelApplication, doc);
+                ScheduleNameTextBox = {Text = selectedPanel.Name}
+            };
 
-                wnd.ScheduleNameTextBox.Text = selectedPanel.Name;
-
-                if (wnd.ShowDialog() != true)
-                {
-                    return;
-                }
-
-                workbookPath = wnd.FilePathTextBox.Text;
-                worksheetName = (string) wnd.SheetComboBox.SelectedItem;
-                scheduleType = wnd.ScheduleTypeTextBox.Text;
-                scheduleName = wnd.ScheduleNameTextBox.Text;
-
-                excelApplication.Quit();
+            if (wnd.ShowDialog() != true)
+            {
+                return;
             }
 
-            PanelScheduleView schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
+            var workbookPath = wnd.FilePathTextBox.Text;
+            var worksheetName = (string) wnd.SheetComboBox.SelectedItem;
+            var scheduleType = wnd.ScheduleTypeTextBox.Text;
+            var scheduleName = wnd.ScheduleNameTextBox.Text;
+
+            var schedule = PanelScheduleView.CreateInstanceView(doc, selectedPanel.Id);
             schedule.ViewName = scheduleName;
 
-            var importer = new ScheduleImporter(schedule);
-            importer.ImportFromFile(workbookPath, worksheetName);
-
-            StoreImportInformation(schedule, workbookPath, worksheetName, scheduleType);
+            ManagedScheduleLink.CreateNew(schedule, workbookPath, worksheetName, scheduleType);
         }
 
         public static List<ManagedScheduleLink> GetManagedSchedules(Document doc)
@@ -96,11 +84,6 @@ namespace ElectricalToolSuite.ScheduleImport
                     .ToList();
 
             return managedSchedules;
-        }
-
-        public static void StoreImportInformation(PanelScheduleView schedule, string workbookPath, string worksheetName, string scheduleType)
-        {
-            LinkGateway.CreateLink(schedule, workbookPath, worksheetName, scheduleType);
         }
     }
 }

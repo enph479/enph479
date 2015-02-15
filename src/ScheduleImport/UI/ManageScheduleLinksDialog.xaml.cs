@@ -85,35 +85,29 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             var selectedLink = (ManagedScheduleLink)ManagedScheduleLinksDataGrid.SelectedItem;
 
-            using (var excelApplication = new NetOffice.ExcelApi.Application { DisplayAlerts = false })
-            {
-                var wnd = new SheetSelectionDialog(excelApplication, _document);
+            var wnd = new SheetSelectionDialog(_document);
 
-                wnd.ScheduleNameTextBox.Text = selectedLink.ScheduleName;
-                wnd.ScheduleTypeTextBox.Text = selectedLink.ScheduleType;
+            wnd.ScheduleNameTextBox.Text = selectedLink.ScheduleName;
+            wnd.ScheduleTypeTextBox.Text = selectedLink.ScheduleType;
 
-                wnd.FilePathTextBox.Text = selectedLink.WorkbookPath;
+            wnd.FilePathTextBox.Text = selectedLink.WorkbookPath;
 
-                wnd.OkButton.Content = "Save";
+            wnd.OkButton.Content = "Save";
 
-                wnd.ValidName = selectedLink.ScheduleName;
+            wnd.ValidName = selectedLink.ScheduleName;
 
 //                wnd.ScheduleNameTextBox.IsEnabled = false;
 //                wnd.ScheduleTypeTextBox.IsEnabled = false;
 
-                wnd.Title = "Edit Excel Schedule Link";
+            wnd.Title = "Edit Excel Schedule Link";
 
-                    if (wnd.ShowDialog() != true)
-                        return;
+                if (wnd.ShowDialog() != true)
+                    return;
 
-                    workbookPath = wnd.FilePathTextBox.Text;
-                    worksheetName = (string)wnd.SheetComboBox.SelectedItem;
-                    scheduleName = wnd.ScheduleNameTextBox.Text;
-                    scheduleType = wnd.ScheduleTypeTextBox.Text;
-
-
-                excelApplication.Quit();
-            }
+                workbookPath = wnd.FilePathTextBox.Text;
+                worksheetName = (string)wnd.SheetComboBox.SelectedItem;
+                scheduleName = wnd.ScheduleNameTextBox.Text;
+                scheduleType = wnd.ScheduleTypeTextBox.Text;
 
             selectedLink.WorkbookPath = workbookPath;
             selectedLink.WorksheetName = worksheetName;

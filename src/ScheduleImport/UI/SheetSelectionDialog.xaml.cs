@@ -19,12 +19,11 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     {
         public bool HasValidExcelFile { get; set; }
         public string ValidName { get; set; }
-        private readonly Excel.Application _excelApplication;
-        private readonly Autodesk.Revit.DB.Document _document;
+        private readonly Document _document;
 
-        public SheetSelectionDialog(Excel.Application excelApplication, Autodesk.Revit.DB.Document doc)
+        public SheetSelectionDialog(Document doc)
         {
-            _excelApplication = excelApplication;
+
             _document = doc;
 
             HasValidExcelFile = false;
@@ -66,15 +65,13 @@ namespace ElectricalToolSuite.ScheduleImport.UI
                 OpenWorkbookButton.IsEnabled = true;
 
                 // TODO This is probably way too slow to put here
-                using (var workbook = _excelApplication.Workbooks.Open(FilePathTextBox.Text, false, true))
+                using (var workbook = ExcelSingleton.OpenWorkbook(FilePathTextBox.Text))
                 {
                     var worksheets = workbook.Worksheets.Cast<Excel.Worksheet>().Select(s => s.Name).ToList();
                     SheetComboBox.ItemsSource = worksheets;
 
                     if (worksheets.Any())
                         SheetComboBox.SelectedIndex = 0;
-
-                    workbook.Close();
                 }
             }
             else
