@@ -5,11 +5,21 @@ namespace ElectricalToolSuite.ScheduleImport
 {
     public class ExcelSingleton : IDisposable
     {
-        private static readonly ExcelSingleton _instance;
+        private static ExcelSingleton _instance;
 
-        static ExcelSingleton()
+        public static void Initialize()
         {
             _instance = new ExcelSingleton();
+        }
+
+        public static void Close()
+        {
+            if (_instance != null)
+            {
+                Instance.Quit();
+                Instance.Dispose();
+                _instance = null;
+            }
         }
 
         public static Excel.Application Instance { get { return _instance._application; } }
@@ -28,7 +38,10 @@ namespace ElectricalToolSuite.ScheduleImport
 
         public void Dispose()
         {
-            _application.Dispose();
+            if (_application != null)
+            {
+                _application.Dispose();
+            }
         }
     }
 }

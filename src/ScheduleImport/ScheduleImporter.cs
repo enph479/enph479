@@ -55,6 +55,8 @@ namespace ElectricalToolSuite.ScheduleImport
                 var usedRange = worksheet.UsedRange;
                 PrepareScheduleForImport(usedRange);
                 cells = CreateCells(usedRange);
+
+                workbook.Close();
             }
 
             SetMergedCells(cells);

@@ -18,28 +18,37 @@ namespace ElectricalToolSuite.ScheduleImport
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            var uiDoc = commandData.Application.ActiveUIDocument;
-            var doc = uiDoc.Document;
+            ExcelSingleton.Initialize();
 
-            while (true)
+            try
             {
-                var mgWnd = new ManageScheduleLinksDialog(doc, uiDoc);
-                var managedSchedules = GetManagedSchedules(doc);
-                mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
-                mgWnd.UpdateButtons();
-                mgWnd.ShowDialog();
+                var uiDoc = commandData.Application.ActiveUIDocument;
+                var doc = uiDoc.Document;
 
-                if (mgWnd.PressedCreate)
+                while (true)
                 {
-                    CreateLink(uiDoc, doc);
+                    var mgWnd = new ManageScheduleLinksDialog(doc, uiDoc);
+                    var managedSchedules = GetManagedSchedules(doc);
+                    mgWnd.ManagedScheduleLinksDataGrid.ItemsSource = managedSchedules;
+                    mgWnd.UpdateButtons();
+                    mgWnd.ShowDialog();
+
+                    if (mgWnd.PressedCreate)
+                    {
+                        CreateLink(uiDoc, doc);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    break;
-                }
+
+                return Result.Succeeded;
             }
-
-            return Result.Succeeded;
+            finally
+            {
+                ExcelSingleton.Close();
+            }
         }
 
         private static void CreateLink(UIDocument uiDoc, Document doc)
@@ -81,11 +90,10 @@ namespace ElectricalToolSuite.ScheduleImport
                 .Cast<PanelScheduleView>()
                 .Where(LinkGateway.IsLinked);
 
-            var managedSchedules =
-                (from sched in linkedSchedules
-                    select new ManagedScheduleLink(sched))
-                    .OrderBy(l => l.ScheduleName)
-                    .ToList();
+            var managedSchedules = (from sched in linkedSchedules
+                select new ManagedScheduleLink(sched))
+                .OrderBy(l => l.ScheduleName)
+                .ToList();
 
             return managedSchedules;
         }

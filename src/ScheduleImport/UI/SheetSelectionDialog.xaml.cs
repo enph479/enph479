@@ -37,35 +37,10 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             HasValidExcelFile = false;
             SheetComboBox.IsEnabled = false;
-
-            Closing += SheetSelectionDialog_Closing;
             
             var rule = (ScheduleNameValidator)ScheduleNameTextBox.GetBindingExpression(TextBox.TextProperty).ParentBinding.ValidationRules.First();
             rule.RevitDocument = Document;
 
-        }
-
-        void SheetSelectionDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            var scheduleName = ScheduleNameTextBox.Text;
-
-            if (DialogResult == true && ValidName != null && scheduleName != ValidName)
-            {
-                var existingSchedule =
-                    new FilteredElementCollector(Document).OfClass(typeof(PanelScheduleView))
-                        .Cast<PanelScheduleView>().Any(s => s.Name == scheduleName);
-
-                if (existingSchedule)
-                {
-                    var dlg = new TaskDialog("Cannot rename schedule");
-                    dlg.MainInstruction = String.Format("There is already a panel schedule with name '{0}.'",
-                        scheduleName);
-                    dlg.MainIcon = TaskDialogIcon.TaskDialogIconWarning;
-                    dlg.Show();
-                    e.Cancel = true;
-                    Focus();
-                }
-            }
         }
 
         void FilePathTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -85,6 +60,10 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
                         if (worksheets.Any())
                             SheetComboBox.SelectedIndex = 0;
+                        else
+                            SheetComboBox.SelectedIndex = -1;
+
+                        workbook.Close();
                     }
                 }
                 catch (Exception)
@@ -135,7 +114,14 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
         private void OpenWorkbookButton_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(FilePathTextBox.Text);
+            try
+            {
+                Process.Start(FilePathTextBox.Text);
+            }
+            catch (Exception ex)
+            {
+                TaskDialog.Show("Unable to start Excel", ex.Message);
+            }
         }
     }
 }
