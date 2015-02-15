@@ -7,8 +7,8 @@
              mc:Ignorable="d" ResizeMode="NoResize" Title="New Excel Schedule Link" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" x:Name="Window">
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
-                        CanExecute="CanExecuteHandler"
-                        />
+                    CanExecute="OkCommand_CanExecute"/>
+        <CommandBinding Command="Open" CanExecute="OpenWorkbook_CanExecute" Executed="OpenWorkbook"></CommandBinding>
     </Window.CommandBindings>
 
     <Window.Resources>
@@ -50,14 +50,24 @@
                 </TextBox.Text>
             </TextBox>
             <Button x:Name="FileDialogButton" Content="..." HorizontalAlignment="Right" Width="30" Click="FileDialogButton_Click" Height="26" VerticalAlignment="Bottom" Margin="5,0,5,0"/>
-            <Button x:Name="OpenWorkbookButton" Content="Open Workbook" IsEnabled="False" Click="OpenWorkbookButton_Click" HorizontalAlignment="Right" Width="108" Height="26" VerticalAlignment="Bottom"/>
+            <Button x:Name="OpenWorkbookButton" Content="Open Workbook" Command="Open" HorizontalAlignment="Right" Width="108" Height="26" VerticalAlignment="Bottom"/>
         </WrapPanel>
         <WrapPanel Margin="0,0,0,10">
             <Label Content="Selected Sheet:" HorizontalAlignment="Left" Padding="0,5,5,5" Height="26" VerticalAlignment="Bottom" Width="100"/>
-            <ComboBox x:Name="SheetComboBox" HorizontalAlignment="Left" MaxWidth="400" Height="22" VerticalAlignment="Bottom"/>
+            <ComboBox x:Name="SheetComboBox" HorizontalAlignment="Left" MaxWidth="400" Height="22" VerticalAlignment="Bottom" ItemsSource="{Binding Worksheets, Mode=TwoWay}">
+                <ComboBox.Style>
+                    <Style TargetType="ComboBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=SheetComboBox, Path=SelectedItem}" Value="{x:Null}">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ComboBox.Style>
+            </ComboBox>
         </WrapPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="OkButton" Content="OK" VerticalAlignment="Bottom" Width="75" Click="OkButton_Click" Command="ApplicationCommands.Close" Height="25" Margin="5,5,5,5"/>
+            <Button x:Name="OkButton" Content="OK" VerticalAlignment="Bottom" Width="75" Click="OkButton_Click" Height="25" Margin="5,5,5,5" Command="ApplicationCommands.Close" />
             <Button x:Name="CancelButton" Content="Cancel" IsCancel="True" VerticalAlignment="Bottom" Width="75" Height="25" Margin="5,5,5,5"/>
         </StackPanel>
     </StackPanel>

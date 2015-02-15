@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Electrical;
 using Autodesk.Revit.UI;
 using Microsoft.Win32;
 using Excel = NetOffice.ExcelApi;
@@ -18,14 +18,16 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     /// </summary>
     public partial class SheetSelectionDialog
     {
-        public bool HasValidExcelFile { get; set; }
-        public string ValidName { get; set; }
-
         public Document Document { get; set; }
 
         public string ScheduleName { get; set; }
 
         public string WorkbookPath { get; set; }
+
+        public bool HasAnySheets
+        {
+            get { return SheetComboBox.SelectedIndex > -1; }
+        }
 
         public SheetSelectionDialog(Document doc)
         {
@@ -35,48 +37,35 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             Document = doc;
 
-            HasValidExcelFile = false;
-            SheetComboBox.IsEnabled = false;
-            
-            var rule = (ScheduleNameValidator)ScheduleNameTextBox.GetBindingExpression(TextBox.TextProperty).ParentBinding.ValidationRules.First();
+            var rule = (ScheduleNameValidator) ScheduleNameTextBox.GetBindingExpression(TextBox.TextProperty).ParentBinding.ValidationRules.First();
             rule.RevitDocument = Document;
-
         }
 
         void FilePathTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!FilePathTextBox.GetBindingExpression(TextBox.TextProperty).HasError)
-            {
-                HasValidExcelFile = true;
-                SheetComboBox.IsEnabled = true;
-                OpenWorkbookButton.IsEnabled = true;
-
-                try
-                {
-                    using (var workbook = ExcelSingleton.OpenWorkbook(FilePathTextBox.Text))
-                    {
-                        var worksheets = workbook.Worksheets.Cast<Excel.Worksheet>().Select(s => s.Name).ToList();
-                        SheetComboBox.ItemsSource = worksheets;
-
-                        if (worksheets.Any())
-                            SheetComboBox.SelectedIndex = 0;
-                        else
-                            SheetComboBox.SelectedIndex = -1;
-
-                        workbook.Close();
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-            else
+            if (FilePathTextBox.GetBindingExpression(TextBox.TextProperty).HasError)
             {
                 SheetComboBox.ItemsSource = Enumerable.Empty<string>();
-                HasValidExcelFile = false;
-                SheetComboBox.IsEnabled = false;
-                OpenWorkbookButton.IsEnabled = false;
+                return;
+            }
+            
+            try
+            {
+                using (var workbook = ExcelSingleton.OpenWorkbook(FilePathTextBox.Text))
+                {
+                    var worksheets = workbook.Worksheets.Cast<Excel.Worksheet>().Select(s => s.Name).ToList();
+                    SheetComboBox.ItemsSource = worksheets;
+
+                    if (worksheets.Any())
+                        SheetComboBox.SelectedIndex = 0;
+                    else
+                        SheetComboBox.SelectedIndex = -1;
+
+                    workbook.Close();
+                }
+            }
+            catch (Exception)
+            {
             }
         }
 
@@ -97,7 +86,12 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             }
         }
 
-        private void CanExecuteHandler(object sender, CanExecuteRoutedEventArgs e)
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
+
+        private void OkCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             bool hasSelectedSheet = SheetComboBox.SelectedIndex > -1;
 
@@ -107,12 +101,13 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             e.CanExecute = !validationErrors && hasSelectedSheet;
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private void OpenWorkbook_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            DialogResult = true;
+            e.CanExecute = !FilePathTextBox.GetBindingExpression(TextBox.TextProperty).HasError
+                           && !String.IsNullOrWhiteSpace(FilePathTextBox.Text);
         }
 
-        private void OpenWorkbookButton_Click(object sender, RoutedEventArgs e)
+        private void OpenWorkbook(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {

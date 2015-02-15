@@ -75,8 +75,6 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             wnd.OkButton.Content = "Save";
 
-            wnd.ValidName = selectedLink.ScheduleName;
-
             wnd.Title = "Edit Excel Schedule Link";
 
             if (wnd.ShowDialog() != true)
