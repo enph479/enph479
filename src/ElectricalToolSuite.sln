@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindAndReplace", "FindAndRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport", "ScheduleImport\ScheduleImport.csproj", "{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "Installer\Installer.vdproj", "{5D8CF713-49D0-4E51-8956-B8804F532918}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Electrical Tool Suite Installer", "Installer\Installer.vdproj", "{5D8CF713-49D0-4E51-8956-B8804F532918}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,7 +35,6 @@ Global
 		{B705134D-378F-4F39-AEFA-C59A6752AD6E}.Release|x64.ActiveCfg = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
@@ -65,7 +64,6 @@ Global
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|x64.ActiveCfg = Release|Any CPU
 		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Any CPU.ActiveCfg = Debug
 		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Mixed Platforms.Build.0 = Debug
 		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|x64.ActiveCfg = Debug
 		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Any CPU.ActiveCfg = Release
 		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Mixed Platforms.ActiveCfg = Release
