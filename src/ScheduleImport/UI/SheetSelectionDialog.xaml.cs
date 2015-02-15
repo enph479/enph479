@@ -21,9 +21,10 @@ namespace ElectricalToolSuite.ScheduleImport.UI
         public string ValidName { get; set; }
         private readonly Document _document;
 
+        public string WorkbookPath { get; set; }
+
         public SheetSelectionDialog(Document doc)
         {
-
             _document = doc;
 
             HasValidExcelFile = false;
@@ -31,6 +32,8 @@ namespace ElectricalToolSuite.ScheduleImport.UI
             SheetComboBox.IsEnabled = false;
 
             Closing += SheetSelectionDialog_Closing;
+
+            this.DataContext = this;
         }
 
         void SheetSelectionDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)

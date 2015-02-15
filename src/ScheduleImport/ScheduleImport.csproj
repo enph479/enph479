@@ -91,6 +91,7 @@
     <Compile Include="UI\SheetSelectionDialog.xaml.cs">
       <DependentUpon>SheetSelectionDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\WorkbookPathValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
