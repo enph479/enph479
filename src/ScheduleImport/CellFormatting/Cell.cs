@@ -2,7 +2,7 @@
 
 namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    internal class Cell
+    public class Cell
     {
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }

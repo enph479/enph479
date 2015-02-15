@@ -1,6 +1,6 @@
 ﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    internal enum BorderLineStyle
+    public enum BorderLineStyle
     {
         Unknown,
         NoBorder,

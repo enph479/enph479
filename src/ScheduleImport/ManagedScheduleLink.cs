@@ -58,7 +58,10 @@ namespace ElectricalToolSuite.ScheduleImport
         public void Reload()
         {
             if (WorkbookExists)
-                ExternalCommand.ImportSchedule(_schedule, WorkbookPath, WorksheetName);            
+            {
+                var importer = new ScheduleImporter(_schedule);
+                importer.ImportFromFile(WorkbookPath, WorksheetName);
+            }
         }
 
         public string StatusText

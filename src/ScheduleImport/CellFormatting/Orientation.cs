@@ -1,6 +1,6 @@
 ﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    internal enum Orientation
+    public enum Orientation
     {
         Unknown,
         Downward,

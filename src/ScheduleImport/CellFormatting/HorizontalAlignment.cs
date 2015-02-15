@@ -1,6 +1,6 @@
 ﻿namespace ElectricalToolSuite.ScheduleImport.CellFormatting
 {
-    internal enum HorizontalAlignment
+    public enum HorizontalAlignment
     {
         Unknown,
         Left,
