@@ -35,7 +35,13 @@ namespace ElectricalToolSuite.ScheduleImport
 
                     if (mgWnd.PressedCreate)
                     {
-                        CreateLink(uiDoc, doc);
+                        try
+                        {
+                            CreateLink(uiDoc, doc);
+                        }
+                        catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                        {
+                        }
                     }
                     else
                     {

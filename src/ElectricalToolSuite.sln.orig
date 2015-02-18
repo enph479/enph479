@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MECoordination", "MECoordination\MECoordination.csproj", "{B705134D-378F-4F39-AEFA-C59A6752AD6E}"
 EndProject
@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionLoader", "Extensio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FindAndReplace", "FindAndReplace\FindAndReplace.csproj", "{39C2088F-9B57-401A-AD3F-1389E9C2312D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport", "ScheduleImport\ScheduleImport.csproj", "{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "ElectricalToolSuiteInstaller", "Installer\ElectricalToolSuiteInstaller.wixproj", "{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Electrical Tool Suite Installer", "Installer\Installer.vdproj", "{5D8CF713-49D0-4E51-8956-B8804F532918}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheduleImport", "ScheduleImport\ScheduleImport.csproj", "{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,9 +35,9 @@ Global
 		{B705134D-378F-4F39-AEFA-C59A6752AD6E}.Release|x64.ActiveCfg = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A1E6BB09-C663-4AAA-895D-CCAE59D7513E}.Release|x64.ActiveCfg = Release|Any CPU
@@ -53,23 +53,19 @@ Global
 		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Release|x64.ActiveCfg = Release|x64
 		{39C2088F-9B57-401A-AD3F-1389E9C2312D}.Release|x64.Build.0 = Release|x64
+		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Debug|x64.ActiveCfg = Debug|x86
+		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Release|Any CPU.ActiveCfg = Release|x86
+<<<<<<< HEAD
+		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A4EC9F57-CEC0-421E-B593-40A14D5E30F0}.Release|x64.ActiveCfg = Release|x86
+=======
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{B1810A8D-EE25-4635-A8F0-9C96267BA9B4}.Release|x64.ActiveCfg = Release|Any CPU
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Any CPU.ActiveCfg = Debug
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Debug|x64.ActiveCfg = Debug
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Any CPU.ActiveCfg = Release
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Any CPU.Build.0 = Release
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|Mixed Platforms.ActiveCfg = Release
-		{5D8CF713-49D0-4E51-8956-B8804F532918}.Release|x64.ActiveCfg = Release
+>>>>>>> ScheduleImport
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

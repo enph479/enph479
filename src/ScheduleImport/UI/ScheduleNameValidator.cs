@@ -13,6 +13,8 @@ namespace ElectricalToolSuite.ScheduleImport.UI
     {
         public object RevitDocument { get; set; }
 
+        public string ExemptedName { get; set; }
+
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             if (RevitDocument == null)
@@ -22,6 +24,9 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             if (String.IsNullOrWhiteSpace(name))
                 return new ValidationResult(false, null);
+
+            if (!String.IsNullOrWhiteSpace(ExemptedName) && ExemptedName == name)
+                return new ValidationResult(true, null);
 
             if (new FilteredElementCollector((Document) RevitDocument).OfClass(typeof (PanelScheduleView))
                         .Cast<PanelScheduleView>().Any(s => s.Name == name))

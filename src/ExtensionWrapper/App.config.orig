@@ -1,7 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <appSettings>
+<<<<<<< HEAD
+    <add key="TargetAssembly" value="FindAndReplace.dll"/>
+    <add key="TargetCommand" value="ElectricalToolSuite.FindAndReplace.ExternalCommand"/>
+=======
     <add key="TargetAssembly" value="ScheduleImport.dll"/>
     <add key="TargetCommand" value="ElectricalToolSuite.ScheduleImport.ExternalCommand"/>
+>>>>>>> ScheduleImport
   </appSettings>
 </configuration>

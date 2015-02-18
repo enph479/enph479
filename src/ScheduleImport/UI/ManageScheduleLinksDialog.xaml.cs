@@ -68,10 +68,17 @@ namespace ElectricalToolSuite.ScheduleImport.UI
 
             var wnd = new SheetSelectionDialog(_document);
 
-            wnd.ScheduleName = selectedLink.ScheduleName;
-            wnd.ScheduleTypeTextBox.Text = selectedLink.ScheduleType;
+            var rule = (ScheduleNameValidator)wnd.ScheduleNameTextBox.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty).ParentBinding.ValidationRules.First();
+            rule.ExemptedName = selectedLink.ScheduleName;
 
+            wnd.ScheduleName = selectedLink.ScheduleName;
+            wnd.ScheduleNameTextBox.Text = selectedLink.ScheduleName;
+            wnd.ScheduleTypeTextBox.Text = selectedLink.ScheduleType;
             wnd.WorkbookPath = selectedLink.WorkbookPath;
+            wnd.FilePathTextBox.Text = selectedLink.WorkbookPath;
+            
+            wnd.ScheduleNameTextBox.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty).UpdateSource();
+            wnd.FilePathTextBox.GetBindingExpression(System.Windows.Controls.TextBox.TextProperty).UpdateSource();
 
             wnd.OkButton.Content = "Save";
 

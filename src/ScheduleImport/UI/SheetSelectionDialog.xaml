@@ -28,7 +28,7 @@
                 <Label Content="Schedule name:" Padding="0,5,5,5" Height="26" VerticalAlignment="Top" Width="100"/>
                 <TextBox x:Name="ScheduleNameTextBox" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="175"  >
                     <TextBox.Text>
-                        <Binding Path="ScheduleName" UpdateSourceTrigger="LostFocus">
+                        <Binding Path="ScheduleName" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <ui:ScheduleNameValidator/>
                             </Binding.ValidationRules>
