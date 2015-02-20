@@ -92,7 +92,7 @@ namespace ElectricalToolSuite.ScheduleImport
                 _table.RemoveRow(_table.LastRowNumber);
 
             while (_table.NumberOfColumns < colCount + 1)
-                _table.InsertColumn(_table.LastColumnNumber);
+                _table.InsertColumn(_table.LastColumnNumber, true);
 
             while (_table.NumberOfColumns > colCount + 1)
                 _table.RemoveColumn(_table.LastColumnNumber);

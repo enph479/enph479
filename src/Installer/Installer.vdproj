@@ -171,7 +171,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:..\\bin\\Debug\\ElectricalToolSuite.msi"
+        "OutputFilename" = "8:..\\bin\\Release\\Excel Schedule Importer 2014.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -198,7 +198,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:..\\bin\\Release\\ExcelScheduleImporter.msi"
+        "OutputFilename" = "8:..\\bin\\Release\\Excel Schedule Importer 2014.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -303,7 +303,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+            "AssemblyAsmDisplayName" = "8:RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64"
                 "ScatterAssemblies"
                 {
                     "_43495EB68DB3F2754918A536911E7A5C"
@@ -334,7 +334,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+            "AssemblyAsmDisplayName" = "8:RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64"
                 "ScatterAssemblies"
                 {
                     "_482A419C080277E9F59B8E79A2736AFF"
@@ -493,7 +493,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_9AD49E12F97841D1BE8112F56A51E4D3"
             {
-            "DefaultLocation" = "8:[CommonAppDataFolder]\\Autodesk\\Revit\\Addins\\2015\\"
+            "DefaultLocation" = "8:[CommonAppDataFolder]\\Autodesk\\Revit\\Addins\\2014\\"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -607,10 +607,10 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Revit 2015 Excel Schedule Importer"
-        "ProductCode" = "8:{93BE01E9-5075-4971-9669-8D6EF8C58C57}"
-        "PackageCode" = "8:{0F395110-2515-4769-9C91-A82A33E8996F}"
-        "UpgradeCode" = "8:{85244A4F-A113-4922-BBA9-D36F0CA521A1}"
+        "ProductName" = "8:Revit 2014 Excel Schedule Importer"
+        "ProductCode" = "8:{17C780CC-4DB8-4977-BD1E-CF5923F7ACB8}"
+        "PackageCode" = "8:{2E6C2E29-8896-451B-BA87-BE5A1C7294B0}"
+        "UpgradeCode" = "8:{8F57179A-ECDF-4137-AE45-DC1822DF44AF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -620,7 +620,7 @@
         "Manufacturer" = "8:UBC ENPH 479"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Revit 2015 Excel Schedule Importer"
+        "Title" = "8:Revit 2014 Excel Schedule Importer"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Forrest Paul"
         "Keywords" = "8:"
